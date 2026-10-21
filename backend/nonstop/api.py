@@ -34,6 +34,18 @@ def airports():
     return sorted(out, key=lambda a: -a["seats"])
 
 
+@app.get("/api/top-routes")
+def top_routes():
+    """Every airport's #1 missing leisure route (new markets only), with coordinates, for the home map."""
+    df, ap = service.predictions(), data.airports()
+    fresh = df[df.metro_served == 0]
+    best = fresh.loc[fresh.groupby("origin").score.idxmax()]
+    return [{"origin": r.origin, "dest": r.dest, "dest_city": city(r.dest), "score": float(r.launch_score),
+             "from": [ap.at[r.origin, "lon"], ap.at[r.origin, "lat"]], "to": [ap.at[r.dest, "lon"], ap.at[r.dest, "lat"]],
+             "launched": bool(r.already_launched)}
+            for _, r in best.iterrows()]
+
+
 @app.get("/api/airport/{code}/opportunities")
 def opportunities(code: str, limit: int = 15, second_airports: bool = False):
     """Top missing leisure routes for an airport. By default, destinations whose metro is already

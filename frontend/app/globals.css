@@ -2,13 +2,13 @@
 @import "maplibre-gl/dist/maplibre-gl.css";
 
 :root {
-  --bg: #070b14;
-  --panel: #0d1424;
-  --panel-2: #121b30;
-  --line: #1e2a44;
-  --text: #e7ecf5;
-  --muted: #8a97b2;
-  --faint: #5b6782;
+  --bg: #04070e;
+  --panel: #0a1120;
+  --panel-2: #0f1830;
+  --line: #1a2643;
+  --text: #e9eef7;
+  --muted: #94a2bd;
+  --faint: #5e6b88;
   --route: #f5b544;
   --taste: #3dd6f5;
   --called: #3ee08f;
@@ -27,8 +27,9 @@
   --color-taste: var(--taste);
   --color-called: var(--called);
   --color-miss: var(--miss);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-sans-src), system-ui, sans-serif;
+  --font-display: var(--font-display-src), var(--font-sans-src), sans-serif;
+  --font-mono: var(--font-mono-src), ui-monospace, monospace;
 }
 
 html, body {
@@ -37,16 +38,22 @@ html, body {
 }
 
 body {
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
 }
 
+.font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
 .tabular { font-variant-numeric: tabular-nums; }
 
 .glass {
-  background: color-mix(in srgb, var(--panel) 88%, transparent);
-  backdrop-filter: blur(10px);
+  background: linear-gradient(180deg, rgba(14, 22, 42, 0.92), rgba(9, 15, 30, 0.92));
+  backdrop-filter: blur(14px);
   border: 1px solid var(--line);
 }
 
-.maplibregl-ctrl-attrib { font-size: 10px; background: rgba(7, 11, 20, 0.6) !important; }
+/* Thin, quiet scrollbars inside panels. */
+.glass ::-webkit-scrollbar, .glass::-webkit-scrollbar { width: 6px; }
+.glass ::-webkit-scrollbar-thumb, .glass::-webkit-scrollbar-thumb { background: #1d2a48; border-radius: 6px; }
+
+.maplibregl-ctrl-attrib { font-size: 10px; background: rgba(4, 7, 14, 0.7) !important; }
 .maplibregl-ctrl-attrib a { color: var(--muted) !important; }
