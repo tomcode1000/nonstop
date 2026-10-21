@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+node_modules/
+data/raw/
+.cache/
+.venv/
+data/derived/
+
+# Internal planning notes (strategy, judge notes) stay local
+BRIEF.md
+screenshots/

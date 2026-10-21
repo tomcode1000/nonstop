@@ -1,0 +1,52 @@
+@import "tailwindcss";
+@import "maplibre-gl/dist/maplibre-gl.css";
+
+:root {
+  --bg: #070b14;
+  --panel: #0d1424;
+  --panel-2: #121b30;
+  --line: #1e2a44;
+  --text: #e7ecf5;
+  --muted: #8a97b2;
+  --faint: #5b6782;
+  --route: #f5b544;
+  --taste: #3dd6f5;
+  --called: #3ee08f;
+  --miss: #f0566a;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-route: var(--route);
+  --color-taste: var(--taste);
+  --color-called: var(--called);
+  --color-miss: var(--miss);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+.tabular { font-variant-numeric: tabular-nums; }
+
+.glass {
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--line);
+}
+
+.maplibregl-ctrl-attrib { font-size: 10px; background: rgba(7, 11, 20, 0.6) !important; }
+.maplibregl-ctrl-attrib a { color: var(--muted) !important; }

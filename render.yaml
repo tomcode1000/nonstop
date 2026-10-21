@@ -1,0 +1,32 @@
+# Render Blueprint for Nonstop. Deploy from the PRIVATE deploy repo, which also carries the prepared
+# data bundle (data/derived, .cache/features, data/raw/airports.csv). The public repo has code only,
+# because the hackathon rules forbid publishing Qloo data.
+services:
+  - type: web
+    name: nonstop-api
+    runtime: python
+    plan: free
+    rootDir: .
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && uvicorn nonstop.api:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.10
+      - key: QLOO_API_KEY
+        sync: false        # paste in the Render dashboard; never committed
+      - key: DEEPSEEK_API_KEY
+        sync: false
+
+  - type: web
+    name: nonstop-web
+    runtime: node
+    plan: free
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start -- -p $PORT
+    envVars:
+      - key: NODE_VERSION
+        value: 22.19.0
+      - key: NEXT_PUBLIC_API_URL
+        value: https://nonstop-api.onrender.com   # change if Render assigns a different URL
