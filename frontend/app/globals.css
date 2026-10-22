@@ -13,6 +13,11 @@
   --taste: #3dd6f5;
   --called: #3ee08f;
   --miss: #f0566a;
+  /* Font stacks as real variables (Tailwind's @theme inline does not emit them, so CSS that used
+     var(--font-display) silently fell back to the system font). */
+  --font-sans: var(--font-sans-src), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-display-src), var(--font-sans-src), system-ui, sans-serif;
+  --font-mono: var(--font-mono-src), ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 @theme inline {
@@ -27,9 +32,9 @@
   --color-taste: var(--taste);
   --color-called: var(--called);
   --color-miss: var(--miss);
-  --font-sans: var(--font-sans-src), system-ui, sans-serif;
-  --font-display: var(--font-display-src), var(--font-sans-src), sans-serif;
-  --font-mono: var(--font-mono-src), ui-monospace, monospace;
+  --font-sans: var(--font-sans-src), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-display-src), var(--font-sans-src), system-ui, sans-serif;
+  --font-mono: var(--font-mono-src), ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 html, body {
@@ -42,7 +47,7 @@ body {
   font-feature-settings: "cv11", "ss01";
 }
 
-.font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
+.font-display { font-family: var(--font-display); letter-spacing: -0.03em; font-feature-settings: "ss01", "cv11"; }
 .tabular { font-variant-numeric: tabular-nums; }
 
 .glass {
@@ -97,3 +102,8 @@ body {
 .arc-draw { stroke-dasharray: 260; animation: draw-arc 1.6s cubic-bezier(.6,.05,.25,1) .3s both; }
 @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 .live-dot { animation: pulse-dot 1.8s ease-in-out infinite; }
+
+/* Map credit on the light chart map: quiet ink text on paper instead of the dark pill. */
+.chart-map .maplibregl-ctrl-attrib { background: rgba(244, 241, 232, 0.85) !important; color: #6b7686; }
+.chart-map .maplibregl-ctrl-attrib a { color: #6b7686 !important; }
+.chart-map .maplibregl-ctrl-attrib-button { filter: invert(0.2); background-color: transparent !important; }

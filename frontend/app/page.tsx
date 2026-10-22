@@ -36,7 +36,7 @@ export default function Landing() {
 
       {/* ------------------------------------------------------------ HERO */}
       <section className="relative graticule border-b border-[var(--rule)] overflow-hidden">
-        <div className="mx-auto max-w-[1240px] px-5 sm:px-8 pt-28 pb-16 lg:pb-24 grid lg:grid-cols-[1fr_1.05fr] gap-12 lg:gap-10 items-center">
+        <div className="mx-auto max-w-[1240px] px-5 sm:px-8 pt-28 pb-16 lg:pb-24 grid lg:grid-cols-[1fr_1.05fr] gap-12 lg:gap-6 items-start">
           <div>
             <Link href="/replay" className="inline-flex items-center gap-2 rounded-full border border-[var(--rule)] bg-white/70 px-3 py-1.5 text-[12.5px] text-[var(--ink-2)] hover:border-[var(--ink-3)]">
               <span className="live-dot h-2 w-2 rounded-full bg-[var(--green)]" />
@@ -44,12 +44,12 @@ export default function Landing() {
               <span aria-hidden>→</span>
             </Link>
 
-            <h1 className="font-display mt-6 text-[44px] sm:text-[60px] lg:text-[68px] font-extrabold leading-[0.98] tracking-[-0.035em]">
-              Your town&apos;s next{" "}
+            <h1 className="font-display mt-6 text-[46px] sm:text-[62px] lg:text-[72px] font-[640] leading-[1.0] tracking-[-0.052em]">
+              Your town’s next{" "}
               <span className="relative inline-block text-[var(--amber)]">
                 nonstop
                 {/* A flight path drawn under the word: origin dot, dashed arc, destination dot. */}
-                <svg className="absolute -bottom-3 left-0 w-full h-4 overflow-visible" viewBox="0 0 220 16" preserveAspectRatio="none" aria-hidden>
+                <svg className="absolute -bottom-[7px] left-[2%] w-[96%] h-[10px] overflow-visible" viewBox="0 0 220 16" preserveAspectRatio="none" aria-hidden>
                   <path className="arc-draw" d="M6 6 C 60 18, 160 18, 214 6" fill="none" stroke="var(--amber)" strokeWidth="2.5" strokeDasharray="5 5" strokeLinecap="round" />
                   <circle cx="6" cy="6" r="4" fill="var(--ink)" /><circle cx="214" cy="6" r="4" fill="var(--amber)" />
                 </svg>
@@ -72,18 +72,16 @@ export default function Landing() {
             </p>
           </div>
 
-          {/* Product window with live map and floating real-data cards */}
-          <div className="relative lg:pl-4">
-            <div className="relative rounded-[22px] bg-[#04070e] p-1.5 shadow-[0_40px_80px_-30px_rgba(11,22,38,0.55),0_0_0_1px_rgba(11,22,38,0.08)]">
-              <div className="flex items-center justify-between px-3 py-2">
-                <div className="flex gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-white/15" /><i className="h-2.5 w-2.5 rounded-full bg-white/15" /><i className="h-2.5 w-2.5 rounded-full bg-white/15" /></div>
-                <span className="font-mono text-[10.5px] text-white/40">nonstop / every airport&apos;s #1 missing route</span>
-                <span className="flex items-center gap-1.5 rounded-full bg-white/[0.06] px-2 py-0.5 font-mono text-[10px] text-[#3ee08f]"><i className="live-dot h-1.5 w-1.5 rounded-full bg-[#3ee08f]" />LIVE</span>
-              </div>
-              <div className="relative aspect-[16/11] overflow-hidden rounded-[16px]">
-                <NationalMap interactive={false} vignette={false} view={{ longitude: -96, latitude: 37.2, zoom: 2.85, pitch: 35, bearing: -6 }} />
-              </div>
+          {/* The live map printed straight onto the chart paper: no window, edges fade into the page. */}
+          <div className="relative lg:-mt-6 lg:-mr-10">
+            <div
+              className="chart-map relative aspect-[16/12] [mask-image:radial-gradient(ellipse_62%_60%_at_52%_52%,#000_42%,transparent_96%)]"
+            >
+              <NationalMap theme="chart" interactive={false} vignette={false} view={{ longitude: -96, latitude: 38, zoom: 2.95, pitch: 28, bearing: -6 }} />
             </div>
+            <span className="absolute left-[14%] top-[9%] flex items-center gap-1.5 rounded-full border border-[var(--rule)] bg-[var(--paper)]/90 px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--ink-2)]">
+              <i className="live-dot h-1.5 w-1.5 rounded-full bg-[var(--green)]" /> Live · every airport&apos;s #1 missing route
+            </span>
 
             {hero && (
               <div className="absolute -left-2 sm:-left-10 -bottom-12 sm:-bottom-10 w-[300px] sm:w-[330px] z-10">
@@ -111,7 +109,7 @@ export default function Landing() {
       {/* ------------------------------------------------------------ THE PROBLEM */}
       <section className="mx-auto max-w-[1240px] px-5 sm:px-8 pt-28 pb-20">
         <Eyebrow>The problem</Eyebrow>
-        <h2 className="font-display mt-3 max-w-[820px] text-[34px] sm:text-[46px] font-bold leading-[1.04] tracking-[-0.03em]">
+        <h2 className="font-display mt-3 max-w-[820px] text-[34px] sm:text-[46px] font-[620] leading-[1.02] tracking-[-0.045em]">
           Airports pitch new routes with yesterday&apos;s tickets.
         </h2>
         <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-[var(--rule)] bg-[var(--rule)] sm:grid-cols-3">
@@ -140,7 +138,7 @@ export default function Landing() {
       <section id="how" className="border-y border-[var(--rule)] bg-[var(--paper-2)]/60 graticule">
         <div className="mx-auto max-w-[1240px] px-5 sm:px-8 py-24">
           <Eyebrow>How it works</Eyebrow>
-          <h2 className="font-display mt-3 max-w-[760px] text-[34px] sm:text-[46px] font-bold leading-[1.04] tracking-[-0.03em]">
+          <h2 className="font-display mt-3 max-w-[760px] text-[34px] sm:text-[46px] font-[620] leading-[1.02] tracking-[-0.045em]">
             Four data layers, one ranked list per airport.
           </h2>
           <ol className="relative mt-14 grid gap-8 md:grid-cols-4">
@@ -155,7 +153,7 @@ export default function Landing() {
             ].map(([n, title, body]) => (
               <li key={n} className="relative">
                 <span className={`relative z-10 grid h-9 w-9 place-items-center rounded-full border font-mono text-[12px] font-semibold ${n === "03" ? "border-[var(--cyan)] bg-[var(--cyan)] text-white" : "border-[var(--ink)] bg-[var(--paper)] text-[var(--ink)]"}`}>{n}</span>
-                <h3 className={`font-display mt-5 text-[19px] font-bold tracking-[-0.015em] ${n === "03" ? "text-[var(--cyan)]" : ""}`}>{title}</h3>
+                <h3 className={`font-display mt-5 text-[20px] font-[620] tracking-[-0.025em] ${n === "03" ? "text-[var(--cyan)]" : ""}`}>{title}</h3>
                 <p className="mt-2 text-[14px] leading-[1.6] text-[var(--ink-2)]">{body}</p>
               </li>
             ))}
@@ -167,7 +165,7 @@ export default function Landing() {
       <section className="mx-auto max-w-[1240px] px-5 sm:px-8 py-24">
         <Eyebrow>Inside an airport</Eyebrow>
         <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
-          <h2 className="font-display max-w-[720px] text-[34px] sm:text-[46px] font-bold leading-[1.04] tracking-[-0.03em]">
+          <h2 className="font-display max-w-[720px] text-[34px] sm:text-[46px] font-[620] leading-[1.02] tracking-[-0.045em]">
             Boise, for example.
           </h2>
           <Link href="/airport/BOI" className="rounded-full border border-[var(--ink)] px-5 py-2.5 text-[14px] font-semibold hover:bg-[var(--ink)] hover:text-[var(--paper)]">Open Boise →</Link>
@@ -220,7 +218,7 @@ export default function Landing() {
         <div className="mx-auto max-w-[1240px] px-5 sm:px-8 py-24 grid gap-12 lg:grid-cols-[1fr_1.1fr] items-center">
           <div>
             <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#3dd6f5]">Proof, not promises</p>
-            <h2 className="font-display mt-3 text-[34px] sm:text-[46px] font-bold leading-[1.04] tracking-[-0.03em]">
+            <h2 className="font-display mt-3 text-[34px] sm:text-[46px] font-[620] leading-[1.02] tracking-[-0.045em]">
               We let it call 2025 before 2025 happened.
             </h2>
             <p className="mt-5 max-w-[480px] text-[16px] leading-[1.6] text-[#94a2bd]">
@@ -246,7 +244,7 @@ export default function Landing() {
       {/* ------------------------------------------------------------ WHO IT'S FOR */}
       <section id="who" className="mx-auto max-w-[1240px] px-5 sm:px-8 py-24">
         <Eyebrow>Who it&apos;s for</Eyebrow>
-        <h2 className="font-display mt-3 max-w-[760px] text-[34px] sm:text-[46px] font-bold leading-[1.04] tracking-[-0.03em]">
+        <h2 className="font-display mt-3 max-w-[760px] text-[34px] sm:text-[46px] font-[620] leading-[1.02] tracking-[-0.045em]">
           For the people whose job is getting the next flight.
         </h2>
         <div className="mt-12 grid gap-5 md:grid-cols-3">
@@ -257,7 +255,7 @@ export default function Landing() {
           ].map(([t, b], i) => (
             <div key={t} className="rounded-2xl border border-[var(--rule)] bg-white p-6 shadow-[0_18px_40px_-28px_rgba(11,22,38,0.4)]">
               <span className="font-mono text-[12px] text-[var(--amber)]">0{i + 1}</span>
-              <h3 className="font-display mt-3 text-[20px] font-bold tracking-[-0.015em]">{t}</h3>
+              <h3 className="font-display mt-3 text-[21px] font-[620] tracking-[-0.025em]">{t}</h3>
               <p className="mt-2 text-[14.5px] leading-[1.6] text-[var(--ink-2)]">{b}</p>
             </div>
           ))}
@@ -269,7 +267,7 @@ export default function Landing() {
         <div className="mx-auto max-w-[1240px] px-5 sm:px-8 py-20 grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <Eyebrow>Limits, stated plainly</Eyebrow>
-            <h2 className="font-display mt-3 text-[30px] sm:text-[38px] font-bold leading-[1.06] tracking-[-0.03em]">What Nonstop doesn&apos;t claim.</h2>
+            <h2 className="font-display mt-3 text-[30px] sm:text-[38px] font-[620] leading-[1.04] tracking-[-0.045em]">What Nonstop doesn&apos;t claim.</h2>
             <Link href="/proof" className="mt-5 inline-block text-[14px] font-semibold hover:text-[var(--amber)]">The full method and results →</Link>
           </div>
           <ul className="grid gap-4 sm:grid-cols-2">
@@ -280,7 +278,7 @@ export default function Landing() {
               ["Groups, never people", "Qloo describes group tastes. No personal data is sent to it."],
             ].map(([t, b]) => (
               <li key={t} className="rounded-xl border border-[var(--rule)] p-5">
-                <p className="font-display text-[16px] font-bold">{t}</p>
+                <p className="font-display text-[17px] font-[620] tracking-[-0.02em]">{t}</p>
                 <p className="mt-1.5 text-[13.5px] leading-[1.55] text-[var(--ink-2)]">{b}</p>
               </li>
             ))}
@@ -291,7 +289,7 @@ export default function Landing() {
       {/* ------------------------------------------------------------ FINAL CTA */}
       <section className="relative graticule border-t border-[var(--rule)] overflow-hidden">
         <div className="mx-auto max-w-[860px] px-5 sm:px-8 py-28 text-center">
-          <h2 className="font-display text-[40px] sm:text-[56px] font-extrabold leading-[1] tracking-[-0.035em]">
+          <h2 className="font-display text-[42px] sm:text-[60px] font-[640] leading-[0.98] tracking-[-0.05em]">
             Find the flight your town is <span className="text-[var(--amber)]">missing.</span>
           </h2>
           <p className="mx-auto mt-5 max-w-[520px] text-[16px] leading-[1.6] text-[var(--ink-2)]">Type your airport. You&apos;ll see its missing leisure routes, why they rank, and who would fly them.</p>
@@ -335,7 +333,7 @@ function Wordmark({ light = false }: { light?: boolean }) {
         <circle cx="3" cy="17" r="2.4" fill={light ? "#e9eef7" : "#0b1626"} />
         <circle cx="21" cy="17" r="2.4" fill="#e08a0b" />
       </svg>
-      <span className={`font-display text-[19px] font-bold tracking-[-0.02em] ${light ? "text-white" : ""}`}>Nonstop</span>
+      <span className={`font-display text-[20px] font-[650] tracking-[-0.035em] ${light ? "text-white" : ""}`}>Nonstop</span>
     </span>
   );
 }
@@ -373,12 +371,12 @@ function BoardingPass({ origin, originCity, opp }: { origin: string; originCity:
           <span>Missing route · #1</span><span className="text-[var(--amber)]">Score {opp.launch_score.toFixed(1)}</span>
         </div>
         <div className="mt-3 flex items-end justify-between">
-          <div><div className="font-display text-[34px] font-extrabold leading-none tracking-[-0.02em]">{origin}</div><div className="text-[11.5px] text-[var(--ink-3)]">{originCity}</div></div>
+          <div><div className="font-display text-[36px] font-[680] leading-none tracking-[-0.04em]">{origin}</div><div className="text-[11.5px] text-[var(--ink-3)]">{originCity}</div></div>
           <svg width="82" height="26" viewBox="0 0 82 26" aria-hidden className="mb-3">
             <path d="M2 22 C 22 0, 60 0, 80 22" fill="none" stroke="var(--amber)" strokeWidth="2" strokeDasharray="4 4" />
             <circle cx="2" cy="22" r="3" fill="var(--ink)" /><circle cx="80" cy="22" r="3" fill="var(--amber)" />
           </svg>
-          <div className="text-right"><div className="font-display text-[34px] font-extrabold leading-none tracking-[-0.02em] text-[var(--amber)]">{opp.dest}</div><div className="text-[11.5px] text-[var(--ink-3)]">{opp.dest_city.split(",")[0]}</div></div>
+          <div className="text-right"><div className="font-display text-[36px] font-[680] leading-none tracking-[-0.04em] text-[var(--amber)]">{opp.dest}</div><div className="text-[11.5px] text-[var(--ink-3)]">{opp.dest_city.split(",")[0]}</div></div>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-3 text-[11px]">
           <div><div className="font-mono uppercase tracking-[0.12em] text-[var(--ink-3)]">Qloo taste</div><div className="mt-0.5 font-semibold text-[var(--cyan)]">Ahead of {Math.round(opp.qloo.rank_among_towns * 100)}% of US towns</div></div>
@@ -397,7 +395,7 @@ function BoardingPass({ origin, originCity, opp }: { origin: string; originCity:
 function BigNumber({ n, label, source, tone }: { n: string; label: string; source: string; tone?: "red" }) {
   return (
     <div className="bg-[var(--paper)] p-7">
-      <div className={`font-display text-[46px] font-extrabold leading-none tracking-[-0.04em] ${tone === "red" ? "text-[#c2410c]" : ""}`}>{n}</div>
+      <div className={`font-display text-[50px] font-[620] leading-none tracking-[-0.05em] ${tone === "red" ? "text-[#c2410c]" : ""}`}>{n}</div>
       <p className="mt-3 text-[15px] leading-[1.5] text-[var(--ink-2)]">{label}</p>
       <p className="mt-3 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--ink-3)]">{source}</p>
     </div>
@@ -454,7 +452,7 @@ function MiniStat({ v, l, amber }: { v: string; l: string; amber?: boolean }) {
 function DarkNumber({ n, l, cyan }: { n: string; l: string; cyan?: boolean }) {
   return (
     <div className="bg-[var(--ink)] p-6">
-      <div className={`font-display text-[40px] font-extrabold leading-none tracking-[-0.035em] ${cyan ? "text-[#3dd6f5]" : "text-[#3ee08f]"}`}>{n}</div>
+      <div className={`font-display text-[44px] font-[600] leading-none tracking-[-0.05em] ${cyan ? "text-[#3dd6f5]" : "text-[#3ee08f]"}`}>{n}</div>
       <p className="mt-3 text-[13.5px] leading-[1.5] text-[#94a2bd]">{l}</p>
     </div>
   );

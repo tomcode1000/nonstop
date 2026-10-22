@@ -4,7 +4,8 @@ import AppHeader, { MainShell } from "@/components/AppHeader";
 import "./globals.css";
 
 const sans = Inter({ variable: "--font-sans-src", subsets: ["latin"] });
-const display = Inter_Tight({ variable: "--font-display-src", subsets: ["latin"], weight: ["500", "600", "700", "800"] });
+// Variable font (no fixed weights) so headlines can sit at Hypothec-style in-between weights like 620.
+const display = Inter_Tight({ variable: "--font-display-src", subsets: ["latin"] });
 const mono = JetBrains_Mono({ variable: "--font-mono-src", subsets: ["latin"], weight: ["500", "600"] });
 const hand = Caveat({ variable: "--font-hand-src", subsets: ["latin"], weight: ["500", "700"] });
 
@@ -16,8 +17,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body className={`${sans.variable} ${display.variable} ${mono.variable} ${hand.variable} antialiased min-h-screen`}>
+    // Font variables live on <html> because the font stacks in globals.css are defined on :root;
+    // defined lower down, :root could not see them and every page fell back to the system font.
+    <html lang="en" className={`${sans.variable} ${display.variable} ${mono.variable} ${hand.variable}`}>
+      <body className="antialiased min-h-screen">
         <AppHeader />
         <MainShell>{children}</MainShell>
       </body>

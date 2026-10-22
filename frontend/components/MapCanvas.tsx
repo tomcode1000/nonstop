@@ -5,7 +5,7 @@ import type { Layer, MapViewState, PickingInfo } from "@deck.gl/core";
 import type { StyleSpecification } from "maplibre-gl";
 import { useEffect, useState } from "react";
 import Map from "react-map-gl/maplibre";
-import { nonstopStyle } from "@/lib/mapStyle";
+import { chartStyle, nonstopStyle } from "@/lib/mapStyle";
 
 export const US_VIEW: MapViewState = { longitude: -97, latitude: 37.6, zoom: 3.75, pitch: 42, bearing: -8 };
 
@@ -15,16 +15,17 @@ type Props = {
   tooltip?: (info: PickingInfo) => string | null;
   interactive?: boolean;        // false: a still "window" (landing page), so page scrolling is not captured
   vignette?: boolean;
+  theme?: "night" | "chart";    // chart = light, paper-coloured map that blends into the landing page
 };
 
-export default function MapCanvas({ layers, initialView, tooltip, interactive = true, vignette = true }: Props) {
+export default function MapCanvas({ layers, initialView, tooltip, interactive = true, vignette = true, theme = "night" }: Props) {
   const [style, setStyle] = useState<StyleSpecification | null>(null);
   useEffect(() => {
-    nonstopStyle().then(setStyle).catch(() => null);
-  }, []);
+    (theme === "chart" ? chartStyle() : nonstopStyle()).then(setStyle).catch(() => null);
+  }, [theme]);
 
   return (
-    <div className="absolute inset-0 bg-[#04070e]">
+    <div className={`absolute inset-0 ${theme === "chart" ? "bg-transparent" : "bg-[#04070e]"}`}>
       <DeckGL
         layers={layers}
         initialViewState={initialView ?? US_VIEW}
