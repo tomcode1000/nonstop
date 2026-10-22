@@ -16,8 +16,10 @@ const MapCanvas = dynamic(() => import("@/components/MapCanvas"), { ssr: false }
 
 type Route = Opportunity & { path: [number, number, number][]; times: number[] };
 const LOOP = 60;
-// Qloo taste skyline: deep teal to bright cyan to white for the strongest affinity.
-const TASTE_RANGE: [number, number, number][] = [[10, 45, 70], [14, 80, 115], [22, 125, 160], [40, 175, 210], [61, 214, 245], [200, 248, 255]];
+// Qloo taste skyline on chart paper: pale cyan for mild taste, deep chart blue for the strongest.
+const TASTE_RANGE: [number, number, number][] = [[196, 230, 238], [148, 210, 226], [92, 184, 210], [38, 152, 190], [7, 122, 160], [4, 84, 118]];
+const AMBER: [number, number, number] = [214, 128, 8];
+const GREEN: [number, number, number] = [17, 134, 90];
 
 export default function AirportPage({ params }: { params: Promise<{ code: string }> }) {
   const { code: rawCode } = use(params);
@@ -76,15 +78,15 @@ export default function AirportPage({ params }: { params: Promise<{ code: string
           lowerPercentile: 45,
           elevationLowerPercentile: 45,
           colorRange: TASTE_RANGE,
-          opacity: 0.42,
-          material: { ambient: 0.6, diffuse: 0.5, shininess: 24, specularColor: [80, 200, 255] },
+          opacity: 0.55,
+          material: { ambient: 0.75, diffuse: 0.45, shininess: 12, specularColor: [255, 255, 255] },
         }),
       // Glow under the selected route so it reads above the taste skyline.
       new PathLayer<Route>({
         id: "route-glow",
         data: sel,
         getPath: (r) => r.path,
-        getColor: (r) => (r.already_launched_2026 ? [62, 224, 143, 70] : [245, 181, 68, 70]),
+        getColor: (r) => (r.already_launched_2026 ? [...GREEN, 60] : [...AMBER, 55]),
         getWidth: 14,
         widthUnits: "pixels",
         billboard: true,
@@ -93,7 +95,7 @@ export default function AirportPage({ params }: { params: Promise<{ code: string
         id: "routes",
         data: routes,
         getPath: (r) => r.path,
-        getColor: (r) => r.already_launched_2026 ? [62, 224, 143, r.dest === selected ? 255 : 110] : [245, 181, 68, r.dest === selected ? 255 : 80],
+        getColor: (r) => r.already_launched_2026 ? [...GREEN, r.dest === selected ? 255 : 130] : [...AMBER, r.dest === selected ? 255 : 110],
         getWidth: (r) => (r.dest === selected ? 3.5 : 1.4),
         widthUnits: "pixels",
         billboard: true,
@@ -106,7 +108,7 @@ export default function AirportPage({ params }: { params: Promise<{ code: string
         data: routes,
         getPath: (r) => r.path,
         getTimestamps: (r) => r.times,
-        getColor: (r) => (r.dest === selected ? [255, 236, 190] : [255, 196, 92]),
+        getColor: (r) => (r.dest === selected ? [11, 22, 38] : [196, 104, 0]),
         widthMinPixels: 3,
         trailLength: 5,
         fadeTrail: true,
@@ -119,8 +121,8 @@ export default function AirportPage({ params }: { params: Promise<{ code: string
         data: routes,
         getPosition: (r) => [r.lon, r.lat],
         getRadius: (r) => (r.dest === selected ? 30000 : 17000),
-        getFillColor: (r) => (r.already_launched_2026 ? [62, 224, 143] : [245, 181, 68]),
-        getLineColor: [4, 7, 14],
+        getFillColor: (r) => (r.already_launched_2026 ? GREEN : AMBER),
+        getLineColor: [255, 255, 255],
         lineWidthMinPixels: 1.5,
         stroked: true,
         radiusMinPixels: 3,
@@ -134,8 +136,8 @@ export default function AirportPage({ params }: { params: Promise<{ code: string
         getPosition: (p: [number, number]) => p,
         getRadius: 38000,
         radiusMinPixels: 7,
-        getFillColor: [233, 238, 247],
-        getLineColor: [245, 181, 68],
+        getFillColor: [11, 22, 38],
+        getLineColor: [255, 255, 255],
         stroked: true,
         lineWidthMinPixels: 3,
       }),
@@ -145,12 +147,12 @@ export default function AirportPage({ params }: { params: Promise<{ code: string
         getPosition: (r) => [r.lon, r.lat],
         getText: (r) => r.dest,
         getSize: (r) => (r.dest === selected ? 14 : 11),
-        getColor: (r) => (r.dest === selected ? [255, 236, 190, 255] : [190, 200, 220, 200]),
+        getColor: (r) => (r.dest === selected ? [196, 104, 0, 255] : [11, 22, 38, 220]),
         getPixelOffset: [0, -16],
         fontFamily: "JetBrains Mono, monospace",
         fontWeight: 600,
         background: true,
-        getBackgroundColor: [4, 7, 14, 200],
+        getBackgroundColor: [255, 255, 255, 230],
         backgroundPadding: [4, 2],
         updateTriggers: { getSize: selected, getColor: selected },
       }),
@@ -206,7 +208,7 @@ export default function AirportPage({ params }: { params: Promise<{ code: string
             <li key={o.dest}>
               <button
                 onClick={() => setSelected(o.dest)}
-                className={`group w-full flex items-center gap-3 rounded-xl px-2.5 py-2 text-left transition-colors ${o.dest === selected ? "bg-route/[0.09] ring-1 ring-route/50" : "hover:bg-white/[0.035]"}`}
+                className={`group w-full flex items-center gap-3 rounded-xl px-2.5 py-2 text-left transition-colors ${o.dest === selected ? "bg-route/[0.09] ring-1 ring-route/50" : "hover:bg-black/[0.035]"}`}
               >
                 <span className="w-4 text-[11px] text-faint tabular">{o.rank}</span>
                 <CodeTiles code={o.dest} size="sm" tone={o.dest === selected ? "route" : "text"} />
@@ -216,7 +218,7 @@ export default function AirportPage({ params }: { params: Promise<{ code: string
                 ) : (
                   <span className="w-14">
                     <span className="block text-right text-[11.5px] font-semibold tabular text-route">{o.launch_score.toFixed(1)}</span>
-                    <span className="mt-1 block h-[3px] rounded-full bg-white/[0.06] overflow-hidden">
+                    <span className="mt-1 block h-[3px] rounded-full bg-black/[0.06] overflow-hidden">
                       <span className="block h-full bg-route/80" style={{ width: `${Math.max(4, (o.launch_score - 85) * (100 / 15))}%` }} />
                     </span>
                   </span>
@@ -252,7 +254,7 @@ export default function AirportPage({ params }: { params: Promise<{ code: string
       {showHeat && heat && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 hidden lg:flex items-center gap-3 glass rounded-xl px-4 py-2.5 text-[11.5px] text-muted">
           <span className="text-taste font-medium">Qloo taste</span>
-          <span className="h-2 w-28 rounded-full" style={{ background: "linear-gradient(90deg, rgb(10,45,70), rgb(22,125,160), rgb(61,214,245), rgb(200,248,255))" }} />
+          <span className="h-2 w-28 rounded-full" style={{ background: "linear-gradient(90deg, rgb(196,230,238), rgb(92,184,210), rgb(7,122,160), rgb(4,84,118))" }} />
           <span>taller = that area loves {heat.qloo_destination} more (Qloo heat map)</span>
         </div>
       )}
@@ -313,7 +315,7 @@ function RouteCard({ origin, opp, heat, showHeat, setShowHeat }: {
                 <span className={d.driver === "Qloo taste" ? "text-taste font-medium" : "text-text"}>{d.driver}</span>
                 <span className="tabular text-faint">{d.push >= 0 ? "+" : ""}{d.push.toFixed(2)}</span>
               </div>
-              <div className="mt-1.5 h-[5px] rounded-full bg-white/[0.05] relative overflow-hidden">
+              <div className="mt-1.5 h-[5px] rounded-full bg-black/[0.05] relative overflow-hidden">
                 <div className={`absolute h-full rounded-full ${d.push >= 0 ? (d.driver === "Qloo taste" ? "bg-taste" : "bg-route/85") : "bg-miss/80"}`}
                   style={{ left: d.push >= 0 ? "50%" : `${50 - (50 * Math.abs(d.push)) / maxPush}%`, width: `${(50 * Math.abs(d.push)) / maxPush}%` }} />
                 <div className="absolute left-1/2 top-0 h-full w-px bg-white/20" />
@@ -342,7 +344,7 @@ function RouteCard({ origin, opp, heat, showHeat, setShowHeat }: {
                 <span className="font-display font-semibold">{a.name}</span>
                 <span className="text-[12px] tabular text-route">{Math.round(a.probability * 100)}%</span>
               </div>
-              <div className="mt-1.5 h-[3px] rounded-full bg-white/[0.05] overflow-hidden"><div className="h-full bg-route/70" style={{ width: `${a.probability * 100}%` }} /></div>
+              <div className="mt-1.5 h-[3px] rounded-full bg-black/[0.05] overflow-hidden"><div className="h-full bg-route/70" style={{ width: `${a.probability * 100}%` }} /></div>
               <p className="mt-2 text-[11.5px] leading-relaxed text-muted">{a.why.join(" · ")}</p>
             </li>
           ))}
@@ -357,8 +359,8 @@ function Bar({ label, value }: { label: string; value: number }) {
   return (
     <div>
       <div className="flex justify-between text-[12px]"><span className="text-muted">{label}</span><span className="tabular font-semibold text-taste">{Math.round(value * 100)}</span></div>
-      <div className="mt-1.5 h-[5px] rounded-full bg-white/[0.05] overflow-hidden">
-        <div className="h-full rounded-full bg-gradient-to-r from-[#1a7fa3] to-taste shadow-[0_0_8px_rgba(61,214,245,0.5)]" style={{ width: `${Math.max(2, value * 100)}%` }} />
+      <div className="mt-1.5 h-[5px] rounded-full bg-black/[0.05] overflow-hidden">
+        <div className="h-full rounded-full bg-gradient-to-r from-[#5cb8d2] to-taste" style={{ width: `${Math.max(2, value * 100)}%` }} />
       </div>
     </div>
   );
@@ -366,7 +368,7 @@ function Bar({ label, value }: { label: string; value: number }) {
 
 function Mini({ value, label, accent }: { value: string; label: string; accent?: boolean }) {
   return (
-    <div className="rounded-xl bg-white/[0.025] border border-line px-2.5 py-2.5">
+    <div className="rounded-xl bg-black/[0.025] border border-line px-2.5 py-2.5">
       <div className={`font-display text-[17px] font-semibold tabular ${accent ? "text-route" : ""}`}>{value}</div>
       <div className="text-[10.5px] text-muted leading-tight mt-0.5">{label}</div>
     </div>

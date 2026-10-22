@@ -37,7 +37,7 @@ export default function RouteCaseButton({ origin, dest }: { origin: string; dest
       <button
         onClick={build}
         disabled={state === "busy"}
-        className="mt-5 w-full rounded-xl bg-route text-bg font-semibold py-2.5 text-sm disabled:opacity-60"
+        className="mt-5 w-full rounded-xl bg-route text-white font-semibold py-2.5 text-sm disabled:opacity-60"
       >
         {state === "busy" ? "Writing the route case from Nonstop's data…" : "Build the route case for the airline"}
       </button>
@@ -50,7 +50,7 @@ export default function RouteCaseButton({ origin, dest }: { origin: string; dest
               <p className="text-sm font-semibold">Route case · {origin} → {dest}</p>
               <div className="flex gap-2">
                 <button onClick={() => navigator.clipboard.writeText(md)} className="text-xs rounded-lg border border-line px-2.5 py-1.5 hover:border-route">Copy</button>
-                <button onClick={download} className="text-xs rounded-lg bg-route text-bg font-semibold px-2.5 py-1.5">Download .md</button>
+                <button onClick={download} className="text-xs rounded-lg bg-route text-white font-semibold px-2.5 py-1.5">Download .md</button>
                 <button onClick={() => setState("idle")} className="text-xs text-muted px-2" aria-label="Close">✕</button>
               </div>
             </header>

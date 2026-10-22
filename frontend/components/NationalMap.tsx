@@ -15,7 +15,7 @@ type Flight = TopRoute & { path: [number, number, number][]; times: number[] };
 const LOOP = 120;
 
 /** The live national map: every airport, and each airport's #1 missing leisure route as an animated flight. */
-export default function NationalMap({ interactive = true, view, onAirport, vignette = true, theme = "night" }: {
+export default function NationalMap({ interactive = true, view, onAirport, vignette = true, theme = "chart" }: {
   interactive?: boolean;
   view?: MapViewState;
   onAirport?: (code: string) => void;

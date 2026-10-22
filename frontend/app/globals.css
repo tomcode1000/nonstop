@@ -2,17 +2,21 @@
 @import "maplibre-gl/dist/maplibre-gl.css";
 
 :root {
-  --bg: #04070e;
-  --panel: #0a1120;
-  --panel-2: #0f1830;
-  --line: #1a2643;
-  --text: #e9eef7;
-  --muted: #94a2bd;
-  --faint: #5e6b88;
-  --route: #f5b544;
-  --taste: #3dd6f5;
-  --called: #3ee08f;
-  --miss: #f0566a;
+  /* One visual language for the whole site: aeronautical chart paper, ink, amber routes, cyan Qloo. */
+  --bg: #f4f1e8;
+  --panel: #ffffff;
+  --panel-2: #f7f5ef;
+  --line: #e2dccd;
+  --text: #0b1626;
+  --muted: #3a4759;
+  --faint: #6b7686;
+  --route: #d98208;
+  --taste: #0793b5;
+  --called: #11865a;
+  --miss: #cf3a4e;
+  /* Landing-page names for the same palette, usable everywhere. */
+  --paper: #f4f1e8; --paper-2: #ece7da; --ink: #0b1626; --ink-2: #3a4759; --ink-3: #6b7686;
+  --rule: #ddd6c5; --amber: #e08a0b; --cyan: #0793b5; --green: #11865a;
   /* Font stacks as real variables (Tailwind's @theme inline does not emit them, so CSS that used
      var(--font-display) silently fell back to the system font). */
   --font-sans: var(--font-sans-src), system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -51,17 +55,17 @@ body {
 .tabular { font-variant-numeric: tabular-nums; }
 
 .glass {
-  background: linear-gradient(180deg, rgba(14, 22, 42, 0.92), rgba(9, 15, 30, 0.92));
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(14px);
   border: 1px solid var(--line);
 }
 
 /* Thin, quiet scrollbars inside panels. */
 .glass ::-webkit-scrollbar, .glass::-webkit-scrollbar { width: 6px; }
-.glass ::-webkit-scrollbar-thumb, .glass::-webkit-scrollbar-thumb { background: #1d2a48; border-radius: 6px; }
+.glass ::-webkit-scrollbar-thumb, .glass::-webkit-scrollbar-thumb { background: #d9d2c1; border-radius: 6px; }
 
-.maplibregl-ctrl-attrib { font-size: 10px; background: rgba(4, 7, 14, 0.7) !important; }
-.maplibregl-ctrl-attrib a { color: var(--muted) !important; }
+.maplibregl-ctrl-attrib { font-size: 10px; background: rgba(244, 241, 232, 0.85) !important; color: #6b7686; }
+.maplibregl-ctrl-attrib a { color: #6b7686 !important; }
 
 /* ---------------------------------------------------------------- landing: aeronautical chart paper */
 .paper {

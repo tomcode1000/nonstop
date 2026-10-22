@@ -47,7 +47,7 @@ export default function AirportSearch({ dark = false, big = false }: { dark?: bo
         <ul className={`absolute z-20 mt-1.5 w-full rounded-xl overflow-hidden ${list}`}>
           {matches.map((a) => (
             <li key={a.code}>
-              <Link href={`/airport/${a.code}`} className={`flex items-center justify-between gap-3 px-4 py-2.5 ${dark ? "hover:bg-white/[0.04]" : "hover:bg-[var(--paper)]"}`}>
+              <Link href={`/airport/${a.code}`} className={`flex items-center justify-between gap-3 px-4 py-2.5 ${dark ? "hover:bg-black/[0.04]" : "hover:bg-[var(--paper)]"}`}>
                 <span className="flex items-center gap-3">
                   <CodeTiles code={a.code} size="sm" />
                   <span className={`text-sm ${dark ? "text-muted" : "text-[var(--ink-2)]"}`}>{a.city}</span>

@@ -20,7 +20,7 @@ export default function Explore() {
         <p className="mt-2 text-[12.5px] leading-relaxed text-muted">
           Each glowing arc is one airport&apos;s #1 missing route. Green ones already launched in 2026.
         </p>
-        <div className="mt-4"><AirportSearch dark /></div>
+        <div className="mt-4"><AirportSearch /></div>
         <div className="mt-3 flex flex-wrap gap-1.5">
           {QUICK.map((c) => (
             <Link key={c} href={`/airport/${c}`} className="rounded-lg border border-line px-2 py-1 font-mono text-[11.5px] text-muted transition-colors hover:text-route hover:border-route/60">
@@ -31,8 +31,8 @@ export default function Explore() {
       </Panel>
 
       <div className="absolute bottom-4 right-4 hidden sm:flex items-center gap-4 glass rounded-xl px-4 py-2.5 text-[11.5px] text-muted">
-        <span className="flex items-center gap-2"><i className="h-0.5 w-5 rounded bg-route shadow-[0_0_6px_var(--route)]" /> each airport&apos;s #1 missing route</span>
-        <span className="flex items-center gap-2"><i className="h-0.5 w-5 rounded bg-called shadow-[0_0_6px_var(--called)]" /> already launched in 2026</span>
+        <span className="flex items-center gap-2"><i className="h-0.5 w-5 rounded bg-route " /> each airport&apos;s #1 missing route</span>
+        <span className="flex items-center gap-2"><i className="h-0.5 w-5 rounded bg-called " /> already launched in 2026</span>
       </div>
     </div>
   );

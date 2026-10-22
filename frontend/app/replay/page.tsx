@@ -44,7 +44,7 @@ export default function ReplayPage() {
       id: "launch-lines",
       data: shown,
       getPath: (l) => l.path,
-      getColor: (l) => (l.called ? [62, 224, 143, l.month === month ? 230 : 95] : [240, 86, 106, l.month === month ? 200 : 70]),
+      getColor: (l) => (l.called ? [17, 134, 90, l.month === month ? 240 : 120] : [207, 58, 78, l.month === month ? 220 : 95]),
       getWidth: (l) => (l.month === month ? 2.6 : 1.3),
       widthUnits: "pixels",
       billboard: true,
@@ -56,7 +56,7 @@ export default function ReplayPage() {
       data: fresh,
       getPath: (l) => l.path,
       getTimestamps: (l) => l.times,
-      getColor: (l) => (l.called ? [170, 255, 205] : [255, 160, 170]),
+      getColor: (l) => (l.called ? [8, 92, 60] : [150, 30, 45]),
       widthMinPixels: 3.5,
       trailLength: 5,
       fadeTrail: true,
@@ -69,7 +69,7 @@ export default function ReplayPage() {
       getPosition: (l) => l.to,
       getRadius: 26000,
       radiusMinPixels: 4,
-      getFillColor: (l) => (l.called ? [62, 224, 143, 230] : [240, 86, 106, 210]),
+      getFillColor: (l) => (l.called ? [17, 134, 90, 240] : [207, 58, 78, 220]),
     }),
   ];
 
@@ -93,11 +93,11 @@ export default function ReplayPage() {
           already in that airport&apos;s top 10; <span className="text-miss">red</span> means Nonstop missed it.
         </p>
         <div className="mt-5 grid grid-cols-2 gap-2.5">
-          <div className="rounded-xl bg-white/[0.025] border border-line p-3.5">
+          <div className="rounded-xl bg-black/[0.025] border border-line p-3.5">
             <div className="font-display text-[34px] font-semibold tabular leading-none text-called">{called.length}</div>
             <div className="mt-1.5 text-[11.5px] text-muted">called in advance</div>
           </div>
-          <div className="rounded-xl bg-white/[0.025] border border-line p-3.5">
+          <div className="rounded-xl bg-black/[0.025] border border-line p-3.5">
             <div className="font-display text-[34px] font-semibold tabular leading-none">{shown.length}<span className="text-faint text-xl">/{total}</span></div>
             <div className="mt-1.5 text-[11.5px] text-muted">launches so far</div>
           </div>
@@ -108,7 +108,7 @@ export default function ReplayPage() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => { if (month >= 12) setMonth(0); setPlaying((p) => !p); }}
-            className="h-11 w-11 shrink-0 rounded-full bg-route text-bg text-sm font-bold shadow-[0_0_20px_rgba(245,181,68,0.45)]"
+            className="h-11 w-11 shrink-0 rounded-full bg-route text-white text-sm font-bold "
             aria-label={playing ? "Pause" : "Play"}
           >
             {playing ? "❚❚" : "▶"}

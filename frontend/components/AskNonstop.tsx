@@ -65,7 +65,7 @@ export default function AskNonstop() {
     <>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="ml-1 rounded-full bg-taste text-bg font-semibold px-3 py-1.5 text-sm shadow-[0_0_18px_rgba(61,214,245,0.35)]"
+        className="ml-1 rounded-full bg-taste text-white font-semibold px-3 py-1.5 text-sm"
       >
         {open ? "Close" : "Ask"}<span className="hidden sm:inline">{open ? "" : " Nonstop"}</span>
       </button>
@@ -116,7 +116,7 @@ export default function AskNonstop() {
               placeholder={airport ? `Ask about ${airport}…` : "Ask about any airport or route…"}
               className="flex-1 rounded-lg bg-panel-2 border border-line px-3 py-2 text-sm outline-none focus:border-taste"
             />
-            <button disabled={busy} className="rounded-lg bg-taste text-bg px-3 text-sm font-semibold disabled:opacity-50">Send</button>
+            <button disabled={busy} className="rounded-lg bg-taste text-white px-3 text-sm font-semibold disabled:opacity-50">Send</button>
           </form>
         </section>,
         document.body,
