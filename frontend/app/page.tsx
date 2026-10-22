@@ -1,167 +1,461 @@
 "use client";
 
-import { TripsLayer } from "@deck.gl/geo-layers";
-import { PathLayer, ScatterplotLayer } from "@deck.gl/layers";
-import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { CodeTiles, Eyebrow, Panel, Stat } from "@/components/ui";
-import { type Airport, fmtInt, get } from "@/lib/api";
-import { flightPath, timestamps, useLoopClock } from "@/lib/geo";
-
-const MapCanvas = dynamic(() => import("@/components/MapCanvas"), { ssr: false });
+import { useEffect, useState } from "react";
+import AirportSearch from "@/components/AirportSearch";
+import AskNonstop from "@/components/AskNonstop";
+import NationalMap, { type TopRoute } from "@/components/NationalMap";
+import { CodeTiles } from "@/components/ui";
+import { type AirportView, fmtInt, fmtUsd, get, type Opportunity } from "@/lib/api";
 
 type Backtest = {
+  models: Record<string, { auc: number } | number[]>;
   replay: { launches: number; in_top10: number };
   forward: { launches_seen: number; in_top10: number; through_month: number };
 };
-type TopRoute = { origin: string; dest: string; dest_city: string; score: number; from: [number, number]; to: [number, number]; launched: boolean };
-type Flight = TopRoute & { path: [number, number, number][]; times: number[] };
+const MONTHS = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-const QUICK = ["BOI", "SAV", "DSM", "FAT", "BZN", "PSP", "GRR", "RNO"];
-const LOOP = 120;
-
-export default function Home() {
-  const router = useRouter();
-  const [airports, setAirports] = useState<Airport[]>([]);
-  const [routes, setRoutes] = useState<TopRoute[]>([]);
-  const [backtest, setBacktest] = useState<Backtest | null>(null);
-  const [query, setQuery] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const t = useLoopClock(LOOP, 14);
+export default function Landing() {
+  const [bt, setBt] = useState<Backtest | null>(null);
+  const [boi, setBoi] = useState<AirportView | null>(null);
+  const [called, setCalled] = useState<TopRoute | null>(null);
 
   useEffect(() => {
-    get<Airport[]>("/api/airports").then(setAirports).catch((e) => setError(String(e)));
-    get<TopRoute[]>("/api/top-routes").then(setRoutes).catch(() => null);
-    get<Backtest>("/api/backtest").then(setBacktest).catch(() => null);
+    get<Backtest>("/api/backtest").then(setBt).catch(() => null);
+    get<AirportView>("/api/airport/BOI/opportunities?limit=5").then(setBoi).catch(() => null);
+    get<TopRoute[]>("/api/top-routes").then((r) => setCalled(r.filter((x) => x.launched).sort((a, b) => b.score - a.score)[0] ?? null)).catch(() => null);
   }, []);
 
-  const flights: Flight[] = useMemo(
-    () => routes.map((r, i) => ({ ...r, path: flightPath(r.from, r.to), times: timestamps(48, 30, (i * 37) % LOOP) })),
-    [routes],
-  );
-
-  const matches = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return [];
-    return airports.filter((a) => a.code.toLowerCase().startsWith(q) || a.city.toLowerCase().includes(q)).slice(0, 6);
-  }, [query, airports]);
-
-  const maxSeats = Math.max(1, ...airports.map((a) => a.seats));
-  const layers = [
-    new PathLayer<Flight>({
-      id: "route-lines",
-      data: flights,
-      getPath: (f) => f.path,
-      getColor: (f) => (f.launched ? [62, 224, 143, 70] : [245, 181, 68, 38]),
-      widthMinPixels: 1,
-      billboard: true,
-    }),
-    new TripsLayer<Flight>({
-      id: "comets",
-      data: flights,
-      getPath: (f) => f.path,
-      getTimestamps: (f) => f.times,
-      getColor: (f) => (f.launched ? [62, 224, 143] : [255, 196, 92]),
-      widthMinPixels: 2.5,
-      trailLength: 9,
-      fadeTrail: true,
-      currentTime: t,
-      capRounded: true,
-      jointRounded: true,
-    }),
-    new ScatterplotLayer<Airport>({
-      id: "airport-halo",
-      data: airports,
-      getPosition: (a) => [a.lon, a.lat],
-      getRadius: (a) => 22000 + 90000 * Math.sqrt(a.seats / maxSeats),
-      getFillColor: [245, 181, 68, 26],
-      radiusMinPixels: 5,
-    }),
-    new ScatterplotLayer<Airport>({
-      id: "airports",
-      data: airports,
-      getPosition: (a) => [a.lon, a.lat],
-      getRadius: (a) => 7000 + 26000 * Math.sqrt(a.seats / maxSeats),
-      getFillColor: (a) => (a.called_2026 > 0 ? [62, 224, 143, 255] : [255, 214, 140, 235]),
-      radiusMinPixels: 2,
-      pickable: true,
-      onClick: ({ object }) => object && router.push(`/airport/${object.code}`),
-    }),
-  ];
+  const hero = boi?.opportunities[0];
+  const ci = bt?.models["logistic | Qloo AUC lift 90% CI"] as number[] | undefined;
+  const auc = (k: string) => (bt?.models[k] as { auc: number } | undefined)?.auc;
 
   return (
-    <div className="relative h-[calc(100vh-3.5rem)] w-full overflow-hidden">
-      <MapCanvas
-        layers={layers}
-        tooltip={({ object, layer }) => {
-          if (layer?.id !== "airports") return null;
-          const a = object as Airport | undefined;
-          return a ? `${a.code} · ${a.city}\n${fmtInt(a.seats)} seats a year\nTop missing route → ${a.top_opportunity} (${a.top_score.toFixed(1)})` : null;
-        }}
-      />
+    <div className="paper min-h-screen">
+      <LandingHeader />
 
-      <Panel className="absolute left-3 right-3 top-3 sm:left-5 sm:right-auto sm:top-5 sm:w-[440px] p-6">
-        <Eyebrow tone="taste">Powered by Qloo&apos;s taste graph</Eyebrow>
-        <h1 className="font-display mt-3 text-[30px] sm:text-[34px] font-semibold leading-[1.05]">
-          The leisure flights<br />your town is <span className="text-route">missing.</span>
-        </h1>
-        <p className="mt-3 text-[13.5px] leading-relaxed text-muted">
-          Nonstop reads every US route and ticket record, adds Qloo&apos;s map of where people&apos;s tastes already
-          point, and tells an airport which leisure routes to pitch next, and to which airline.
-        </p>
-
-        <div className="relative mt-5">
-          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-faint" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" /><path d="M20 20l-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && matches[0] && router.push(`/airport/${matches[0].code}`)}
-            placeholder="Find your airport — Boise, Savannah, BZN…"
-            className="w-full rounded-xl bg-[#060b17] border border-line pl-10 pr-4 py-3 text-sm outline-none transition-colors focus:border-route/70 placeholder:text-faint"
-          />
-          {matches.length > 0 && (
-            <ul className="absolute z-10 mt-1.5 w-full rounded-xl glass overflow-hidden">
-              {matches.map((a) => (
-                <li key={a.code}>
-                  <Link href={`/airport/${a.code}`} className="flex items-center justify-between gap-3 px-3.5 py-2.5 hover:bg-white/[0.04]">
-                    <span className="flex items-center gap-3"><CodeTiles code={a.code} size="sm" /> <span className="text-sm text-muted">{a.city}</span></span>
-                    <span className="text-[11px] text-faint">top: <span className="font-mono text-route">{a.top_opportunity}</span></span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {QUICK.map((c) => (
-            <Link key={c} href={`/airport/${c}`} className="rounded-lg border border-line px-2 py-1 font-mono text-[11.5px] text-muted transition-colors hover:text-route hover:border-route/60">
-              {c}
+      {/* ------------------------------------------------------------ HERO */}
+      <section className="relative graticule border-b border-[var(--rule)] overflow-hidden">
+        <div className="mx-auto max-w-[1240px] px-5 sm:px-8 pt-28 pb-16 lg:pb-24 grid lg:grid-cols-[1fr_1.05fr] gap-12 lg:gap-10 items-center">
+          <div>
+            <Link href="/replay" className="inline-flex items-center gap-2 rounded-full border border-[var(--rule)] bg-white/70 px-3 py-1.5 text-[12.5px] text-[var(--ink-2)] hover:border-[var(--ink-3)]">
+              <span className="live-dot h-2 w-2 rounded-full bg-[var(--green)]" />
+              {bt ? <>Live · {bt.forward.in_top10} of 2026&apos;s first {bt.forward.launches_seen} new leisure routes called before launch</> : "Live forecasts for 279 US airports"}
+              <span aria-hidden>→</span>
             </Link>
-          ))}
+
+            <h1 className="font-display mt-6 text-[44px] sm:text-[60px] lg:text-[68px] font-extrabold leading-[0.98] tracking-[-0.035em]">
+              Your town&apos;s next{" "}
+              <span className="relative inline-block text-[var(--amber)]">
+                nonstop
+                {/* A flight path drawn under the word: origin dot, dashed arc, destination dot. */}
+                <svg className="absolute -bottom-3 left-0 w-full h-4 overflow-visible" viewBox="0 0 220 16" preserveAspectRatio="none" aria-hidden>
+                  <path className="arc-draw" d="M6 6 C 60 18, 160 18, 214 6" fill="none" stroke="var(--amber)" strokeWidth="2.5" strokeDasharray="5 5" strokeLinecap="round" />
+                  <circle cx="6" cy="6" r="4" fill="var(--ink)" /><circle cx="214" cy="6" r="4" fill="var(--amber)" />
+                </svg>
+              </span>{" "}
+              is already in the data.
+            </h1>
+
+            <p className="mt-6 max-w-[540px] text-[17px] leading-[1.6] text-[var(--ink-2)]">
+              Nonstop reads every US route and ticket record, adds Qloo&apos;s map of where people&apos;s tastes already
+              point, and tells an airport which leisure routes to pitch next, and to which airline.
+            </p>
+
+            <div className="mt-8 max-w-[520px]"><AirportSearch big /></div>
+            <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <Link href="/explore" className="rounded-full bg-[var(--ink)] px-5 py-2.5 text-[14px] font-semibold text-[var(--paper)] hover:bg-black">Open the live map</Link>
+              <Link href="/replay" className="text-[14px] font-semibold text-[var(--ink)] hover:text-[var(--amber)]">Watch it call 2025 in January →</Link>
+            </div>
+            <p className="mt-8 font-mono text-[11px] uppercase tracking-[0.14em] text-[var(--ink-3)]">
+              US DOT T-100 · DB1B ticket sample · Qloo Taste AI · 279 airports · 61 airlines
+            </p>
+          </div>
+
+          {/* Product window with live map and floating real-data cards */}
+          <div className="relative lg:pl-4">
+            <div className="relative rounded-[22px] bg-[#04070e] p-1.5 shadow-[0_40px_80px_-30px_rgba(11,22,38,0.55),0_0_0_1px_rgba(11,22,38,0.08)]">
+              <div className="flex items-center justify-between px-3 py-2">
+                <div className="flex gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-white/15" /><i className="h-2.5 w-2.5 rounded-full bg-white/15" /><i className="h-2.5 w-2.5 rounded-full bg-white/15" /></div>
+                <span className="font-mono text-[10.5px] text-white/40">nonstop / every airport&apos;s #1 missing route</span>
+                <span className="flex items-center gap-1.5 rounded-full bg-white/[0.06] px-2 py-0.5 font-mono text-[10px] text-[#3ee08f]"><i className="live-dot h-1.5 w-1.5 rounded-full bg-[#3ee08f]" />LIVE</span>
+              </div>
+              <div className="relative aspect-[16/11] overflow-hidden rounded-[16px]">
+                <NationalMap interactive={false} vignette={false} view={{ longitude: -96, latitude: 37.2, zoom: 2.85, pitch: 35, bearing: -6 }} />
+              </div>
+            </div>
+
+            {hero && (
+              <div className="absolute -left-2 sm:-left-10 -bottom-12 sm:-bottom-10 w-[300px] sm:w-[330px] z-10">
+                <BoardingPass origin="BOI" originCity="Boise" opp={hero} />
+              </div>
+            )}
+            {called && (
+              <div className="absolute -right-2 sm:-right-6 -top-6 z-10 rounded-2xl bg-white px-4 py-3 shadow-[0_18px_40px_-18px_rgba(11,22,38,0.45)] border border-[var(--rule)]">
+                <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--green)]">
+                  <span className="grid h-4 w-4 place-items-center rounded-full bg-[var(--green)] text-[9px] text-white">✓</span> Called before launch
+                </div>
+                <div className="mt-1.5 flex items-center gap-2 font-mono text-[15px] font-semibold">
+                  {called.origin} <span className="text-[var(--ink-3)]">→</span> {called.dest}
+                </div>
+                <div className="text-[11.5px] text-[var(--ink-3)]">{called.dest_city} · launched in 2026</div>
+              </div>
+            )}
+            <p className="font-hand absolute -bottom-20 right-2 hidden lg:block text-[26px] leading-none text-[var(--ink-2)] rotate-[-4deg]">
+              every arc is a town&apos;s<br />best missing flight ↑
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------ THE PROBLEM */}
+      <section className="mx-auto max-w-[1240px] px-5 sm:px-8 pt-28 pb-20">
+        <Eyebrow>The problem</Eyebrow>
+        <h2 className="font-display mt-3 max-w-[820px] text-[34px] sm:text-[46px] font-bold leading-[1.04] tracking-[-0.03em]">
+          Airports pitch new routes with yesterday&apos;s tickets.
+        </h2>
+        <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-[var(--rule)] bg-[var(--rule)] sm:grid-cols-3">
+          <BigNumber n="~450" label="brand-new US airport-pair markets open every year" source="US DOT T-100, 2023–2025" />
+          <BigNumber n="4 in 10" label="are no longer served a year later" source="US DOT T-100, 2023–2024 cohorts" tone="red" />
+          <BigNumber n="56 → 14" label="communities applied for federal air-service grants; 14 were funded" source="US DOT, 2026 round" />
         </div>
 
-        {backtest && (
-          <div className="mt-6 grid grid-cols-2 gap-2.5">
-            <Stat value={`${backtest.replay.in_top10}/${backtest.replay.launches}`} label="2025 leisure routes called in January" sub="Time machine · trained on 2024 only" />
-            <Stat value={`${backtest.forward.in_top10}/${backtest.forward.launches_seen}`} label="2026 launches already in an airport's top 10" sub="Never seen in training" />
+        <div className="mt-14 grid gap-5 lg:grid-cols-2">
+          <Compare title="What a route study sees today" tone="muted" rows={[
+            ["Data", "Tickets people already bought"],
+            ["Blind spot", "Demand for a flight that doesn't exist yet"],
+            ["Scope", "One airport, once a year"],
+            ["Cost", "Consultant retainers (Savannah's: $135k a year)"],
+          ]} />
+          <Compare title="What Nonstop adds" tone="amber" rows={[
+            ["Data", "Every route and ticket, plus Qloo's taste graph"],
+            ["Sees", "Where people's tastes already point, flight or not"],
+            ["Scope", "Every missing leisure route, 279 airports, monthly"],
+            ["Output", "The likely airline, and a case written for them"],
+          ]} />
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------ HOW IT WORKS */}
+      <section id="how" className="border-y border-[var(--rule)] bg-[var(--paper-2)]/60 graticule">
+        <div className="mx-auto max-w-[1240px] px-5 sm:px-8 py-24">
+          <Eyebrow>How it works</Eyebrow>
+          <h2 className="font-display mt-3 max-w-[760px] text-[34px] sm:text-[46px] font-bold leading-[1.04] tracking-[-0.03em]">
+            Four data layers, one ranked list per airport.
+          </h2>
+          <ol className="relative mt-14 grid gap-8 md:grid-cols-4">
+            <svg className="pointer-events-none absolute left-0 right-0 top-[18px] hidden md:block w-full h-6" preserveAspectRatio="none" viewBox="0 0 1000 24" aria-hidden>
+              <path d="M20 12 H 980" stroke="var(--ink-3)" strokeWidth="1.5" strokeDasharray="6 8" fill="none" />
+            </svg>
+            {[
+              ["01", "Every route, every month", "US DOT T-100 for all 61 US airlines shows which airport pairs gained a brand-new nonstop each year since 2022."],
+              ["02", "Who already makes the trip", "The DB1B ticket sample shows how many people fly each pair through a connection, and what they pay."],
+              ["03", "Where the taste already is", "Qloo's taste graph maps, town by town, how strongly people lean toward 158 leisure destinations, even with no flight there."],
+              ["04", "Who would fly it", "A model trained on past launches ranks every missing route, and a matchmaker learns each leisure airline's habits."],
+            ].map(([n, title, body]) => (
+              <li key={n} className="relative">
+                <span className={`relative z-10 grid h-9 w-9 place-items-center rounded-full border font-mono text-[12px] font-semibold ${n === "03" ? "border-[var(--cyan)] bg-[var(--cyan)] text-white" : "border-[var(--ink)] bg-[var(--paper)] text-[var(--ink)]"}`}>{n}</span>
+                <h3 className={`font-display mt-5 text-[19px] font-bold tracking-[-0.015em] ${n === "03" ? "text-[var(--cyan)]" : ""}`}>{title}</h3>
+                <p className="mt-2 text-[14px] leading-[1.6] text-[var(--ink-2)]">{body}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------ INSIDE THE PRODUCT */}
+      <section className="mx-auto max-w-[1240px] px-5 sm:px-8 py-24">
+        <Eyebrow>Inside an airport</Eyebrow>
+        <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
+          <h2 className="font-display max-w-[720px] text-[34px] sm:text-[46px] font-bold leading-[1.04] tracking-[-0.03em]">
+            Boise, for example.
+          </h2>
+          <Link href="/airport/BOI" className="rounded-full border border-[var(--ink)] px-5 py-2.5 text-[14px] font-semibold hover:bg-[var(--ink)] hover:text-[var(--paper)]">Open Boise →</Link>
+        </div>
+        {boi && hero && (
+          <div className="mt-12 grid gap-5 lg:grid-cols-3">
+            <Screen title="The missing routes, ranked" note="Each one is a market with no nonstop today.">
+              <ol className="space-y-1.5">
+                {boi.opportunities.map((o) => (
+                  <li key={o.dest} className="flex items-center gap-3 rounded-lg bg-white/[0.03] px-2.5 py-2">
+                    <span className="w-3 text-[11px] text-[#5e6b88]">{o.rank}</span>
+                    <CodeTiles code={o.dest} size="sm" tone={o.rank === 1 ? "route" : "text"} />
+                    <span className="flex-1 text-[12.5px] text-[#94a2bd]">{o.dest_city.split(",")[0]}</span>
+                    <span className="font-mono text-[12px] text-[#f5b544]">{o.launch_score.toFixed(1)}</span>
+                  </li>
+                ))}
+              </ol>
+            </Screen>
+            <Screen title="Why it ranks, with Qloo's evidence" note="Qloo is the cyan layer: taste for a place, mapped town by town." accent="cyan">
+              <div className="space-y-3">
+                <TasteBar label={`Boise's lean toward ${hero.dest_city.split(",")[0]}`} v={hero.qloo.affinity} />
+                <TasteBar label="Ahead of this share of US towns" v={hero.qloo.rank_among_towns} />
+                <TasteBar label="Ahead of Boise's other options" v={hero.qloo.rank_among_own_options} />
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <MiniStat v={fmtInt(Math.max(hero.demand.passengers_per_year, hero.demand.metro_passengers_per_year))} l="already fly it with a connection" />
+                  <MiniStat v={hero.demand.annual_spend_usd ? fmtUsd(hero.demand.annual_spend_usd) : "—"} l="spent on the trip each year" amber />
+                </div>
+              </div>
+            </Screen>
+            <Screen title="The airline, and the pitch" note="One click writes the case an airport sends to an airline planner.">
+              <div className="space-y-2">
+                {hero.airlines.slice(0, 2).map((a, i) => (
+                  <div key={a.carrier} className={`rounded-lg border px-3 py-2 ${i === 0 ? "border-[#f5b544]/40 bg-[#f5b544]/[0.06]" : "border-white/10"}`}>
+                    <div className="flex justify-between text-[13px] font-semibold text-[#e9eef7]"><span>{a.name}</span><span className="font-mono text-[#f5b544]">{Math.round(a.probability * 100)}%</span></div>
+                    <p className="mt-0.5 text-[11px] text-[#94a2bd]">{a.why[0]}</p>
+                  </div>
+                ))}
+                <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] p-3 font-mono text-[10.5px] leading-[1.6] text-[#94a2bd]">
+                  <span className="text-[#3dd6f5]">## The ask</span><br />
+                  Boise requests evaluation of a new nonstop BOI–{hero.dest}, the #1 route in its list of missing markets…
+                </div>
+              </div>
+            </Screen>
           </div>
         )}
-        <div className="mt-4 flex items-center justify-between text-[12px]">
-          <Link href="/replay" className="text-muted hover:text-text">Watch the time machine →</Link>
-          <Link href="/proof" className="text-muted hover:text-text">How we measured it</Link>
-        </div>
-        {error && <p className="mt-3 text-xs text-miss">Can&apos;t reach the Nonstop API ({error}).</p>}
-      </Panel>
+      </section>
 
-      <div className="absolute bottom-4 right-4 hidden sm:flex items-center gap-4 glass rounded-xl px-4 py-2.5 text-[11.5px] text-muted">
-        <span className="flex items-center gap-2"><i className="h-0.5 w-5 rounded bg-route shadow-[0_0_6px_var(--route)]" /> each airport&apos;s #1 missing route</span>
-        <span className="flex items-center gap-2"><i className="h-0.5 w-5 rounded bg-called shadow-[0_0_6px_var(--called)]" /> already launched in 2026</span>
+      {/* ------------------------------------------------------------ PROOF */}
+      <section id="proof" className="bg-[var(--ink)] text-[#e9eef7]">
+        <div className="mx-auto max-w-[1240px] px-5 sm:px-8 py-24 grid gap-12 lg:grid-cols-[1fr_1.1fr] items-center">
+          <div>
+            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#3dd6f5]">Proof, not promises</p>
+            <h2 className="font-display mt-3 text-[34px] sm:text-[46px] font-bold leading-[1.04] tracking-[-0.03em]">
+              We let it call 2025 before 2025 happened.
+            </h2>
+            <p className="mt-5 max-w-[480px] text-[16px] leading-[1.6] text-[#94a2bd]">
+              The model learned only from 2024 launches and saw nothing after December 2024. Then we checked its picks against
+              every new leisure route that really opened in 2025, and against 2026 routes as they appear.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3">
+              <Link href="/replay" className="rounded-full bg-[#f5b544] px-5 py-2.5 text-[14px] font-semibold text-[#0b1626]">Play the time machine</Link>
+              <Link href="/proof" className="text-[14px] font-semibold text-[#e9eef7] hover:text-[#f5b544]">Read the full backtest →</Link>
+            </div>
+          </div>
+          {bt && (
+            <div className="grid gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-2">
+              <DarkNumber n={`${bt.replay.in_top10}/${bt.replay.launches}`} l="new 2025 leisure routes were already in their airport's top 10 in January" />
+              <DarkNumber n={`${bt.forward.in_top10}/${bt.forward.launches_seen}`} l={`2026 launches through ${MONTHS[bt.forward.through_month]} were called before they opened`} />
+              <DarkNumber n={`${auc("logistic | baseline + Qloo")?.toFixed(3)}`} l={`accuracy (AUC) on routes it never saw, up from ${auc("logistic | baseline")?.toFixed(3)} without Qloo`} cyan />
+              <DarkNumber n={ci ? `+${ci[1].toFixed(4)}` : "—"} l={ci ? `Qloo's lift on top of the government's own ticket data (90% CI ${ci[0] >= 0 ? "+" : ""}${ci[0].toFixed(3)} to +${ci[2].toFixed(3)})` : ""} cyan />
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------ WHO IT'S FOR */}
+      <section id="who" className="mx-auto max-w-[1240px] px-5 sm:px-8 py-24">
+        <Eyebrow>Who it&apos;s for</Eyebrow>
+        <h2 className="font-display mt-3 max-w-[760px] text-[34px] sm:text-[46px] font-bold leading-[1.04] tracking-[-0.03em]">
+          For the people whose job is getting the next flight.
+        </h2>
+        <div className="mt-12 grid gap-5 md:grid-cols-3">
+          {[
+            ["Airport air-service teams", "Walk into an airline meeting with the routes your town is missing, the demand already flying them the long way, and the carrier most likely to say yes."],
+            ["Communities applying for grants", "Federal air-service grants ask for evidence of demand. Nonstop gives a ranked, sourced case for the route you're asking to fund."],
+            ["Tourism boards", "See which towns already love your destination and have no nonstop to it yet, and where a co-funded route would land best."],
+          ].map(([t, b], i) => (
+            <div key={t} className="rounded-2xl border border-[var(--rule)] bg-white p-6 shadow-[0_18px_40px_-28px_rgba(11,22,38,0.4)]">
+              <span className="font-mono text-[12px] text-[var(--amber)]">0{i + 1}</span>
+              <h3 className="font-display mt-3 text-[20px] font-bold tracking-[-0.015em]">{t}</h3>
+              <p className="mt-2 text-[14.5px] leading-[1.6] text-[var(--ink-2)]">{b}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------ LIMITS */}
+      <section className="border-t border-[var(--rule)]">
+        <div className="mx-auto max-w-[1240px] px-5 sm:px-8 py-20 grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <Eyebrow>Limits, stated plainly</Eyebrow>
+            <h2 className="font-display mt-3 text-[30px] sm:text-[38px] font-bold leading-[1.06] tracking-[-0.03em]">What Nonstop doesn&apos;t claim.</h2>
+            <Link href="/proof" className="mt-5 inline-block text-[14px] font-semibold hover:text-[var(--amber)]">The full method and results →</Link>
+          </div>
+          <ul className="grid gap-4 sm:grid-cols-2">
+            {[
+              ["Not route survival", "Taste predicts where leisure airlines launch, not which routes last. We tested it; there was no signal."],
+              ["A score, not a probability", "The launch score ranks routes against each other from 0 to 100."],
+              ["Today's taste", "Qloo's data is a 2026 snapshot, so we also check it forward against 2026 launches as they happen."],
+              ["Groups, never people", "Qloo describes group tastes. No personal data is sent to it."],
+            ].map(([t, b]) => (
+              <li key={t} className="rounded-xl border border-[var(--rule)] p-5">
+                <p className="font-display text-[16px] font-bold">{t}</p>
+                <p className="mt-1.5 text-[13.5px] leading-[1.55] text-[var(--ink-2)]">{b}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------ FINAL CTA */}
+      <section className="relative graticule border-t border-[var(--rule)] overflow-hidden">
+        <div className="mx-auto max-w-[860px] px-5 sm:px-8 py-28 text-center">
+          <h2 className="font-display text-[40px] sm:text-[56px] font-extrabold leading-[1] tracking-[-0.035em]">
+            Find the flight your town is <span className="text-[var(--amber)]">missing.</span>
+          </h2>
+          <p className="mx-auto mt-5 max-w-[520px] text-[16px] leading-[1.6] text-[var(--ink-2)]">Type your airport. You&apos;ll see its missing leisure routes, why they rank, and who would fly them.</p>
+          <div className="mx-auto mt-8 max-w-[520px] text-left"><AirportSearch big /></div>
+        </div>
+      </section>
+
+      <footer className="bg-[var(--ink)] text-[#94a2bd]">
+        <div className="mx-auto max-w-[1240px] px-5 sm:px-8 py-12 grid gap-8 md:grid-cols-[1.2fr_1fr_1fr]">
+          <div>
+            <Wordmark light />
+            <p className="mt-3 max-w-[340px] text-[13.5px] leading-[1.6]">Route intelligence for airports: the leisure flights a town is missing, and the airline most likely to fly them.</p>
+          </div>
+          <div className="text-[13px] leading-[1.9]">
+            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#5e6b88]">Product</p>
+            <Link href="/explore" className="block hover:text-white">Live map</Link>
+            <Link href="/replay" className="block hover:text-white">Time machine</Link>
+            <Link href="/proof" className="block hover:text-white">Proof and method</Link>
+          </div>
+          <div className="text-[13px] leading-[1.9]">
+            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#5e6b88]">Data</p>
+            <p>US DOT BTS T-100 and DB1B · OurAirports</p>
+            <p>Taste data from the <span className="text-[#3dd6f5]">Qloo Insights API</span></p>
+            <p>Map tiles © CARTO, © OpenStreetMap contributors</p>
+            <a href="https://github.com/tomcode1000/nonstop" className="block hover:text-white">Source on GitHub (MIT) ↗</a>
+          </div>
+        </div>
+        <p className="border-t border-white/10 px-5 py-4 text-center text-[11.5px] text-[#5e6b88]">Built for the Qloo Agentic Hackathon, 2026. Forecasts, not guarantees.</p>
+      </footer>
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------- pieces */
+
+function Wordmark({ light = false }: { light?: boolean }) {
+  return (
+    <span className="flex items-center gap-2.5">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <path d="M3 17 C 7 5, 17 5, 21 17" stroke="#e08a0b" strokeWidth="2.4" strokeLinecap="round" />
+        <circle cx="3" cy="17" r="2.4" fill={light ? "#e9eef7" : "#0b1626"} />
+        <circle cx="21" cy="17" r="2.4" fill="#e08a0b" />
+      </svg>
+      <span className={`font-display text-[19px] font-bold tracking-[-0.02em] ${light ? "text-white" : ""}`}>Nonstop</span>
+    </span>
+  );
+}
+
+function LandingHeader() {
+  return (
+    <header className="fixed top-0 inset-x-0 z-30 border-b border-[var(--rule)] bg-[rgba(244,241,232,0.85)] backdrop-blur-xl">
+      <div className="mx-auto max-w-[1240px] h-16 px-5 sm:px-8 flex items-center justify-between">
+        <Link href="/"><Wordmark /></Link>
+        <nav className="hidden md:flex items-center gap-7 text-[14px] text-[var(--ink-2)]">
+          <a href="#how" className="hover:text-[var(--ink)]">How it works</a>
+          <a href="#proof" className="hover:text-[var(--ink)]">Proof</a>
+          <a href="#who" className="hover:text-[var(--ink)]">Who it&apos;s for</a>
+          <Link href="/replay" className="hover:text-[var(--ink)]">Time machine</Link>
+        </nav>
+        <div className="flex items-center gap-2">
+          <AskNonstop />
+          <Link href="/explore" className="rounded-full bg-[var(--ink)] px-4 py-2 text-[13px] font-semibold text-[var(--paper)] hover:bg-black">Open the map</Link>
+        </div>
       </div>
+    </header>
+  );
+}
+
+function Eyebrow({ children }: { children: React.ReactNode }) {
+  return <p className="font-mono text-[11.5px] font-medium uppercase tracking-[0.18em] text-[var(--ink-3)]">{children}</p>;
+}
+
+function BoardingPass({ origin, originCity, opp }: { origin: string; originCity: string; opp: Opportunity }) {
+  const airline = opp.airlines[0];
+  return (
+    <div className="ticket rounded-2xl bg-white text-[var(--ink)] shadow-[0_28px_60px_-24px_rgba(11,22,38,0.55)]" style={{ "--tear": "70%" } as React.CSSProperties}>
+      <div className="px-5 pt-4 pb-4">
+        <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--ink-3)]">
+          <span>Missing route · #1</span><span className="text-[var(--amber)]">Score {opp.launch_score.toFixed(1)}</span>
+        </div>
+        <div className="mt-3 flex items-end justify-between">
+          <div><div className="font-display text-[34px] font-extrabold leading-none tracking-[-0.02em]">{origin}</div><div className="text-[11.5px] text-[var(--ink-3)]">{originCity}</div></div>
+          <svg width="82" height="26" viewBox="0 0 82 26" aria-hidden className="mb-3">
+            <path d="M2 22 C 22 0, 60 0, 80 22" fill="none" stroke="var(--amber)" strokeWidth="2" strokeDasharray="4 4" />
+            <circle cx="2" cy="22" r="3" fill="var(--ink)" /><circle cx="80" cy="22" r="3" fill="var(--amber)" />
+          </svg>
+          <div className="text-right"><div className="font-display text-[34px] font-extrabold leading-none tracking-[-0.02em] text-[var(--amber)]">{opp.dest}</div><div className="text-[11.5px] text-[var(--ink-3)]">{opp.dest_city.split(",")[0]}</div></div>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-3 text-[11px]">
+          <div><div className="font-mono uppercase tracking-[0.12em] text-[var(--ink-3)]">Qloo taste</div><div className="mt-0.5 font-semibold text-[var(--cyan)]">Ahead of {Math.round(opp.qloo.rank_among_towns * 100)}% of US towns</div></div>
+          <div><div className="font-mono uppercase tracking-[0.12em] text-[var(--ink-3)]">Likely airline</div><div className="mt-0.5 font-semibold">{airline?.name} · {Math.round((airline?.probability ?? 0) * 100)}%</div></div>
+        </div>
+      </div>
+      <div className="mx-4 border-t-2 border-dashed border-[var(--rule)]" />
+      <div className="px-5 py-3 font-mono text-[10.5px] text-[var(--ink-2)]">
+        {fmtInt(Math.max(opp.demand.passengers_per_year, opp.demand.metro_passengers_per_year))} people a year already fly it with a connection
+        {opp.demand.annual_spend_usd ? ` · ${fmtUsd(opp.demand.annual_spend_usd)}` : ""}
+      </div>
+    </div>
+  );
+}
+
+function BigNumber({ n, label, source, tone }: { n: string; label: string; source: string; tone?: "red" }) {
+  return (
+    <div className="bg-[var(--paper)] p-7">
+      <div className={`font-display text-[46px] font-extrabold leading-none tracking-[-0.04em] ${tone === "red" ? "text-[#c2410c]" : ""}`}>{n}</div>
+      <p className="mt-3 text-[15px] leading-[1.5] text-[var(--ink-2)]">{label}</p>
+      <p className="mt-3 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--ink-3)]">{source}</p>
+    </div>
+  );
+}
+
+function Compare({ title, rows, tone }: { title: string; rows: [string, string][]; tone: "muted" | "amber" }) {
+  const hi = tone === "amber";
+  return (
+    <div className={`rounded-2xl border p-6 ${hi ? "border-[var(--amber)] bg-white shadow-[0_24px_50px_-30px_rgba(224,138,11,0.6)]" : "border-[var(--rule)] bg-transparent"}`}>
+      <p className={`font-mono text-[11px] uppercase tracking-[0.16em] ${hi ? "text-[var(--amber)]" : "text-[var(--ink-3)]"}`}>{title}</p>
+      <dl className="mt-4 divide-y divide-[var(--rule)]">
+        {rows.map(([k, v]) => (
+          <div key={k} className="flex items-center justify-between gap-4 py-3">
+            <dt className="text-[13px] text-[var(--ink-3)]">{k}</dt>
+            <dd className={`text-right text-[14.5px] ${hi ? "font-semibold text-[var(--ink)]" : "text-[var(--ink-2)]"}`}>{v}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+function Screen({ title, note, children, accent }: { title: string; note: string; children: React.ReactNode; accent?: "cyan" }) {
+  return (
+    <div>
+      <div className="rounded-2xl bg-[#0a1120] p-4 shadow-[0_30px_60px_-30px_rgba(11,22,38,0.6)] ring-1 ring-black/5 min-h-[300px]">
+        <p className={`mb-3 font-mono text-[10px] uppercase tracking-[0.16em] ${accent === "cyan" ? "text-[#3dd6f5]" : "text-[#5e6b88]"}`}>{title}</p>
+        {children}
+      </div>
+      <p className="mt-3 px-1 text-[13.5px] leading-[1.5] text-[var(--ink-2)]">{note}</p>
+    </div>
+  );
+}
+
+function TasteBar({ label, v }: { label: string; v: number }) {
+  return (
+    <div>
+      <div className="flex justify-between text-[11.5px]"><span className="text-[#94a2bd]">{label}</span><span className="font-mono text-[#3dd6f5]">{Math.round(v * 100)}</span></div>
+      <div className="mt-1 h-[5px] rounded-full bg-white/[0.06] overflow-hidden"><div className="h-full rounded-full bg-gradient-to-r from-[#1a7fa3] to-[#3dd6f5]" style={{ width: `${v * 100}%` }} /></div>
+    </div>
+  );
+}
+
+function MiniStat({ v, l, amber }: { v: string; l: string; amber?: boolean }) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-2">
+      <div className={`font-display text-[17px] font-bold ${amber ? "text-[#f5b544]" : "text-[#e9eef7]"}`}>{v}</div>
+      <div className="text-[10.5px] leading-tight text-[#94a2bd]">{l}</div>
+    </div>
+  );
+}
+
+function DarkNumber({ n, l, cyan }: { n: string; l: string; cyan?: boolean }) {
+  return (
+    <div className="bg-[var(--ink)] p-6">
+      <div className={`font-display text-[40px] font-extrabold leading-none tracking-[-0.035em] ${cyan ? "text-[#3dd6f5]" : "text-[#3ee08f]"}`}>{n}</div>
+      <p className="mt-3 text-[13.5px] leading-[1.5] text-[#94a2bd]">{l}</p>
     </div>
   );
 }

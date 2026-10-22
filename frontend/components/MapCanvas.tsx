@@ -13,9 +13,11 @@ type Props = {
   layers: Layer[];
   initialView?: MapViewState;   // remount (change `key`) to fly somewhere new
   tooltip?: (info: PickingInfo) => string | null;
+  interactive?: boolean;        // false: a still "window" (landing page), so page scrolling is not captured
+  vignette?: boolean;
 };
 
-export default function MapCanvas({ layers, initialView, tooltip }: Props) {
+export default function MapCanvas({ layers, initialView, tooltip, interactive = true, vignette = true }: Props) {
   const [style, setStyle] = useState<StyleSpecification | null>(null);
   useEffect(() => {
     nonstopStyle().then(setStyle).catch(() => null);
@@ -26,7 +28,7 @@ export default function MapCanvas({ layers, initialView, tooltip }: Props) {
       <DeckGL
         layers={layers}
         initialViewState={initialView ?? US_VIEW}
-        controller={{ dragRotate: true, inertia: 300 }}
+        controller={interactive ? { dragRotate: true, inertia: 300 } : false}
         getTooltip={(info) => {
           const text = tooltip?.(info);
           return text
@@ -37,7 +39,7 @@ export default function MapCanvas({ layers, initialView, tooltip }: Props) {
         {style && <Map mapStyle={style} attributionControl={{ compact: true }} />}
       </DeckGL>
       {/* Vignette: pulls the eye to the centre and hides the map's hard edges. */}
-      <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_160px_60px_rgba(4,7,14,0.85)]" />
+      {vignette && <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_160px_60px_rgba(4,7,14,0.85)]" />}
     </div>
   );
 }

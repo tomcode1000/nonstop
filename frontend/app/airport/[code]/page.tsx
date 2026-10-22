@@ -161,7 +161,7 @@ export default function AirportPage({ params }: { params: Promise<{ code: string
     return (
       <div className="p-8 text-sm">
         <p className="text-miss">No predictions for {code}.</p>
-        <Link href="/" className="text-muted hover:text-text">← Back to the map</Link>
+        <Link href="/explore" className="text-muted hover:text-text">← Back to the map</Link>
       </div>
     );
   }
@@ -185,7 +185,7 @@ export default function AirportPage({ params }: { params: Promise<{ code: string
       {/* Departure board: the airport and its missing routes */}
       <Panel className="absolute left-4 top-4 bottom-4 w-[318px] hidden md:flex flex-col overflow-hidden">
         <div className="p-5 pb-4 border-b border-line">
-          <Link href="/" className="text-[11.5px] text-faint hover:text-text">← All airports</Link>
+          <Link href="/explore" className="text-[11.5px] text-faint hover:text-text">← All airports</Link>
           <div className="mt-3 flex items-center gap-3">
             <CodeTiles code={code} size="lg" tone="route" />
             <div className="min-w-0">
