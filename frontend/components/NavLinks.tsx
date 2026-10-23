@@ -15,7 +15,7 @@ export default function NavLinks() {
     <>
       {LINKS.map((l) => (
         <Link key={l.href} href={l.href}
-          className={`px-2 sm:px-3 py-1.5 rounded-lg transition-colors ${l.match(path) ? "text-text bg-black/[0.06]" : "text-muted hover:text-text hover:bg-black/[0.04]"}`}>
+          className={`px-2 sm:px-3 py-1.5 rounded-lg transition-colors ${l.match(path) ? "text-text bg-white/[0.06]" : "text-muted hover:text-text hover:bg-white/[0.04]"}`}>
           <span className="sm:hidden">{l.short}</span><span className="hidden sm:inline">{l.label}</span>
         </Link>
       ))}

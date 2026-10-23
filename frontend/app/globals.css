@@ -2,21 +2,21 @@
 @import "maplibre-gl/dist/maplibre-gl.css";
 
 :root {
-  /* One visual language for the whole site: aeronautical chart paper, ink, amber routes, cyan Qloo. */
-  --bg: #f4f1e8;
-  --panel: #ffffff;
-  --panel-2: #f7f5ef;
-  --line: #e2dccd;
-  --text: #0b1626;
-  --muted: #3a4759;
-  --faint: #6b7686;
-  --route: #d98208;
-  --taste: #0793b5;
-  --called: #11865a;
-  --miss: #cf3a4e;
-  /* Landing-page names for the same palette, usable everywhere. */
-  --paper: #f4f1e8; --paper-2: #ece7da; --ink: #0b1626; --ink-2: #3a4759; --ink-3: #6b7686;
-  --rule: #ddd6c5; --amber: #e08a0b; --cyan: #0793b5; --green: #11865a;
+  /* One visual language: pure black, white type, one neon accent per meaning. */
+  --bg: #000000;
+  --panel: #0b0b0c;
+  --panel-2: #141416;
+  --line: #232326;
+  --text: #f4f4f5;
+  --muted: #a1a1aa;
+  --faint: #71717a;
+  --route: #ffc53d;   /* neon runway amber: routes, actions */
+  --taste: #45d9ff;   /* Qloo */
+  --called: #4be38f;  /* predicted before it happened */
+  --miss: #ff5c72;
+  /* Older landing-page names, mapped onto the same dark palette. */
+  --paper: #000000; --paper-2: #0b0b0c; --ink: #f4f4f5; --ink-2: #a1a1aa; --ink-3: #71717a;
+  --rule: #232326; --amber: #ffc53d; --cyan: #45d9ff; --green: #4be38f;
   /* Font stacks as real variables (Tailwind's @theme inline does not emit them, so CSS that used
      var(--font-display) silently fell back to the system font). */
   --font-sans: var(--font-sans-src), system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -51,41 +51,31 @@ body {
   font-feature-settings: "cv11", "ss01";
 }
 
-.font-display { font-family: var(--font-display); letter-spacing: -0.03em; font-feature-settings: "ss01", "cv11"; }
+.font-display { font-family: var(--font-display); letter-spacing: -0.025em; font-feature-settings: "ss01", "cv11"; }
 .tabular { font-variant-numeric: tabular-nums; }
 
 .glass {
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(14px);
+  background: #0b0b0c;
   border: 1px solid var(--line);
 }
 
 /* Thin, quiet scrollbars inside panels. */
 .glass ::-webkit-scrollbar, .glass::-webkit-scrollbar { width: 6px; }
-.glass ::-webkit-scrollbar-thumb, .glass::-webkit-scrollbar-thumb { background: #d9d2c1; border-radius: 6px; }
+.glass ::-webkit-scrollbar-thumb, .glass::-webkit-scrollbar-thumb { background: #2a2a2e; border-radius: 6px; }
 
-.maplibregl-ctrl-attrib { font-size: 10px; background: rgba(244, 241, 232, 0.85) !important; color: #6b7686; }
-.maplibregl-ctrl-attrib a { color: #6b7686 !important; }
+.maplibregl-ctrl-attrib { font-size: 10px; background: rgba(0, 0, 0, 0.7) !important; color: #71717a; }
+.maplibregl-ctrl-attrib a { color: #71717a !important; }
 
-/* ---------------------------------------------------------------- landing: aeronautical chart paper */
+/* ---------------------------------------------------------------- landing: same black sheet as the app */
 .paper {
-  --paper: #f4f1e8;
-  --paper-2: #ece7da;
-  --ink: #0b1626;
-  --ink-2: #3a4759;
-  --ink-3: #6b7686;
-  --rule: #ddd6c5;
-  --amber: #e08a0b;
-  --cyan: #0793b5;
-  --green: #11865a;
   background: var(--paper);
   color: var(--ink);
 }
 /* Faint latitude/longitude graticule, like a pilot's chart. */
 .graticule {
   background-image:
-    linear-gradient(to right, rgba(11, 22, 38, 0.045) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(11, 22, 38, 0.045) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
   background-size: 72px 72px;
   background-position: -1px -1px;
 }
@@ -107,7 +97,3 @@ body {
 @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 .live-dot { animation: pulse-dot 1.8s ease-in-out infinite; }
 
-/* Map credit on the light chart map: quiet ink text on paper instead of the dark pill. */
-.chart-map .maplibregl-ctrl-attrib { background: rgba(244, 241, 232, 0.85) !important; color: #6b7686; }
-.chart-map .maplibregl-ctrl-attrib a { color: #6b7686 !important; }
-.chart-map .maplibregl-ctrl-attrib-button { filter: invert(0.2); background-color: transparent !important; }

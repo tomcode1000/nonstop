@@ -2,7 +2,7 @@
 import type { ReactNode } from "react";
 
 export function Panel({ className = "", children }: { className?: string; children: ReactNode }) {
-  return <div className={`glass rounded-2xl shadow-[0_24px_50px_-28px_rgba(11,22,38,0.35)] ${className}`}>{children}</div>;
+  return <div className={`glass rounded-xl ${className}`}>{children}</div>;
 }
 
 export function Eyebrow({ children, tone = "muted" }: { children: ReactNode; tone?: "muted" | "taste" | "route" }) {
@@ -16,9 +16,9 @@ export function CodeTiles({ code, size = "md", tone = "text" }: { code: string; 
   return (
     <span className="inline-flex gap-[3px] align-middle" aria-label={code}>
       {code.split("").map((ch, i) => (
-        <span key={i} className={`relative inline-flex items-center justify-center rounded-[4px] font-mono font-semibold bg-[var(--panel-2)] border border-line shadow-[inset_0_-1px_0_rgba(11,22,38,0.06)] ${box} ${tone === "route" ? "text-route" : "text-text"}`}>
+        <span key={i} className={`relative inline-flex items-center justify-center rounded-[4px] font-mono font-semibold bg-[var(--panel-2)] border border-line  ${box} ${tone === "route" ? "text-route" : "text-text"}`}>
           {ch}
-          <span className="absolute inset-x-0 top-1/2 h-px bg-[rgba(11,22,38,0.10)]" />
+          <span className="absolute inset-x-0 top-1/2 h-px bg-black/70" />
         </span>
       ))}
     </span>
@@ -47,8 +47,8 @@ export function ScoreRing({ value, size = 64 }: { value: number; size?: number }
 export function Stat({ value, label, sub, tone = "called" }: { value: string; label: string; sub?: string; tone?: "called" | "taste" | "route" | "text" }) {
   const color = { called: "text-called", taste: "text-taste", route: "text-route", text: "text-text" }[tone];
   return (
-    <div className="rounded-xl bg-black/[0.025] border border-line px-3.5 py-3">
-      <div className={`font-display text-[26px] font-semibold tabular leading-none ${color}`}>{value}</div>
+    <div className="rounded-xl bg-white/[0.025] border border-line px-3.5 py-3">
+      <div className={`font-mono text-[24px] font-medium tabular tracking-[-0.02em] leading-none ${color}`}>{value}</div>
       <div className="mt-1.5 text-[11.5px] leading-snug text-muted">{label}</div>
       {sub && <div className="mt-1 text-[10.5px] text-faint">{sub}</div>}
     </div>

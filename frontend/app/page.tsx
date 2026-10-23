@@ -38,13 +38,13 @@ export default function Landing() {
       <section className="relative graticule border-b border-[var(--rule)] overflow-hidden">
         <div className="mx-auto max-w-[1240px] px-5 sm:px-8 pt-28 pb-16 lg:pb-24 grid lg:grid-cols-[1fr_1.05fr] gap-12 lg:gap-6 items-start">
           <div>
-            <Link href="/replay" className="inline-flex items-center gap-2 rounded-full border border-[var(--rule)] bg-white/70 px-3 py-1.5 text-[12.5px] text-[var(--ink-2)] hover:border-[var(--ink-3)]">
+            <Link href="/replay" className="inline-flex items-center gap-2 rounded-full border border-[var(--rule)] bg-white/[0.03] px-3 py-1.5 text-[12.5px] text-[var(--ink-2)] hover:border-[var(--ink-3)]">
               <span className="live-dot h-2 w-2 rounded-full bg-[var(--green)]" />
               {bt ? <>Live · {bt.forward.in_top10} of 2026&apos;s first {bt.forward.launches_seen} new leisure routes called before launch</> : "Live forecasts for 279 US airports"}
               <span aria-hidden>→</span>
             </Link>
 
-            <h1 className="font-display mt-6 text-[46px] sm:text-[62px] lg:text-[72px] font-[640] leading-[1.0] tracking-[-0.052em]">
+            <h1 className="font-display mt-6 text-[46px] sm:text-[62px] lg:text-[72px] font-[560] leading-[1.0] tracking-[-0.04em]">
               Your town’s next{" "}
               <span className="relative inline-block text-[var(--amber)]">
                 nonstop
@@ -64,7 +64,7 @@ export default function Landing() {
 
             <div className="mt-8 max-w-[520px]"><AirportSearch big /></div>
             <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
-              <Link href="/explore" className="rounded-full bg-[var(--ink)] px-5 py-2.5 text-[14px] font-semibold text-[var(--paper)] hover:bg-black">Open the live map</Link>
+              <Link href="/explore" className="rounded-lg bg-[var(--ink)] px-5 py-2.5 text-[14px] font-semibold text-[var(--paper)] hover:bg-white/85">Open the live map</Link>
               <Link href="/replay" className="text-[14px] font-semibold text-[var(--ink)] hover:text-[var(--amber)]">Watch it call 2025 in January →</Link>
             </div>
             <p className="mt-8 font-mono text-[11px] uppercase tracking-[0.14em] text-[var(--ink-3)]">
@@ -75,9 +75,9 @@ export default function Landing() {
           {/* The live map printed straight onto the chart paper: no window, edges fade into the page. */}
           <div className="relative lg:-mt-6 lg:-mr-10">
             <div
-              className="chart-map relative aspect-[16/12] [mask-image:radial-gradient(ellipse_62%_60%_at_52%_52%,#000_42%,transparent_96%)]"
+              className="relative aspect-[16/12] [mask-image:radial-gradient(ellipse_62%_60%_at_52%_52%,#000_42%,transparent_96%)]"
             >
-              <NationalMap theme="chart" interactive={false} vignette={false} view={{ longitude: -96, latitude: 38, zoom: 2.95, pitch: 28, bearing: -6 }} />
+              <NationalMap interactive={false} view={{ longitude: -96, latitude: 38, zoom: 2.95, pitch: 28, bearing: -6 }} />
             </div>
             <span className="absolute left-[14%] top-[9%] flex items-center gap-1.5 rounded-full border border-[var(--rule)] bg-[var(--paper)]/90 px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--ink-2)]">
               <i className="live-dot h-1.5 w-1.5 rounded-full bg-[var(--green)]" /> Live · every airport&apos;s #1 missing route
@@ -89,9 +89,9 @@ export default function Landing() {
               </div>
             )}
             {called && (
-              <div className="absolute -right-2 sm:-right-6 -top-6 z-10 rounded-2xl bg-white px-4 py-3 shadow-[0_18px_40px_-18px_rgba(11,22,38,0.45)] border border-[var(--rule)]">
+              <div className="absolute -right-2 sm:-right-6 -top-6 z-10 rounded-xl bg-[#0b0b0c] px-4 py-3 border border-[var(--rule)]">
                 <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--green)]">
-                  <span className="grid h-4 w-4 place-items-center rounded-full bg-[var(--green)] text-[9px] text-white">✓</span> Called before launch
+                  <span className="grid h-4 w-4 place-items-center rounded-full bg-[var(--green)] text-[9px] text-black">✓</span> Called before launch
                 </div>
                 <div className="mt-1.5 flex items-center gap-2 font-mono text-[15px] font-semibold">
                   {called.origin} <span className="text-[var(--ink-3)]">→</span> {called.dest}
@@ -99,9 +99,6 @@ export default function Landing() {
                 <div className="text-[11.5px] text-[var(--ink-3)]">{called.dest_city} · launched in 2026</div>
               </div>
             )}
-            <p className="font-hand absolute -bottom-20 right-2 hidden lg:block text-[26px] leading-none text-[var(--ink-2)] rotate-[-4deg]">
-              every arc is a town&apos;s<br />best missing flight ↑
-            </p>
           </div>
         </div>
       </section>
@@ -109,10 +106,10 @@ export default function Landing() {
       {/* ------------------------------------------------------------ THE PROBLEM */}
       <section className="mx-auto max-w-[1240px] px-5 sm:px-8 pt-28 pb-20">
         <Eyebrow>The problem</Eyebrow>
-        <h2 className="font-display mt-3 max-w-[820px] text-[34px] sm:text-[46px] font-[620] leading-[1.02] tracking-[-0.045em]">
+        <h2 className="font-display mt-3 max-w-[820px] text-[34px] sm:text-[46px] font-[540] leading-[1.02] tracking-[-0.035em]">
           Airports pitch new routes with yesterday&apos;s tickets.
         </h2>
-        <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-[var(--rule)] bg-[var(--rule)] sm:grid-cols-3">
+        <div className="mt-12 grid gap-px overflow-hidden rounded-xl border border-[var(--rule)] bg-[var(--rule)] sm:grid-cols-3">
           <BigNumber n="~450" label="brand-new US airport-pair markets open every year" source="US DOT T-100, 2023–2025" />
           <BigNumber n="4 in 10" label="are no longer served a year later" source="US DOT T-100, 2023–2024 cohorts" tone="red" />
           <BigNumber n="56 → 14" label="communities applied for federal air-service grants; 14 were funded" source="US DOT, 2026 round" />
@@ -138,7 +135,7 @@ export default function Landing() {
       <section id="how" className="border-y border-[var(--rule)] bg-[var(--paper-2)]/60 graticule">
         <div className="mx-auto max-w-[1240px] px-5 sm:px-8 py-24">
           <Eyebrow>How it works</Eyebrow>
-          <h2 className="font-display mt-3 max-w-[760px] text-[34px] sm:text-[46px] font-[620] leading-[1.02] tracking-[-0.045em]">
+          <h2 className="font-display mt-3 max-w-[760px] text-[34px] sm:text-[46px] font-[540] leading-[1.02] tracking-[-0.035em]">
             Four data layers, one ranked list per airport.
           </h2>
           <ol className="relative mt-14 grid gap-8 md:grid-cols-4">
@@ -152,8 +149,8 @@ export default function Landing() {
               ["04", "Who would fly it", "A model trained on past launches ranks every missing route, and a matchmaker learns each leisure airline's habits."],
             ].map(([n, title, body]) => (
               <li key={n} className="relative">
-                <span className={`relative z-10 grid h-9 w-9 place-items-center rounded-full border font-mono text-[12px] font-semibold ${n === "03" ? "border-[var(--cyan)] bg-[var(--cyan)] text-white" : "border-[var(--ink)] bg-[var(--paper)] text-[var(--ink)]"}`}>{n}</span>
-                <h3 className={`font-display mt-5 text-[20px] font-[620] tracking-[-0.025em] ${n === "03" ? "text-[var(--cyan)]" : ""}`}>{title}</h3>
+                <span className={`relative z-10 grid h-9 w-9 place-items-center rounded-full border font-mono text-[12px] font-semibold ${n === "03" ? "border-[var(--cyan)] bg-[var(--cyan)] text-black" : "border-[var(--ink)] bg-[var(--paper)] text-[var(--ink)]"}`}>{n}</span>
+                <h3 className={`font-display mt-5 text-[20px] font-[540] tracking-[-0.025em] ${n === "03" ? "text-[var(--cyan)]" : ""}`}>{title}</h3>
                 <p className="mt-2 text-[14px] leading-[1.6] text-[var(--ink-2)]">{body}</p>
               </li>
             ))}
@@ -165,10 +162,10 @@ export default function Landing() {
       <section className="mx-auto max-w-[1240px] px-5 sm:px-8 py-24">
         <Eyebrow>Inside an airport</Eyebrow>
         <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
-          <h2 className="font-display max-w-[720px] text-[34px] sm:text-[46px] font-[620] leading-[1.02] tracking-[-0.045em]">
+          <h2 className="font-display max-w-[720px] text-[34px] sm:text-[46px] font-[540] leading-[1.02] tracking-[-0.035em]">
             Boise, for example.
           </h2>
-          <Link href="/airport/BOI" className="rounded-full border border-[var(--ink)] px-5 py-2.5 text-[14px] font-semibold hover:bg-[var(--ink)] hover:text-[var(--paper)]">Open Boise →</Link>
+          <Link href="/airport/BOI" className="rounded-lg border border-[var(--ink)] px-5 py-2.5 text-[14px] font-semibold hover:bg-[#0b0b0c] hover:text-black">Open Boise →</Link>
         </div>
         {boi && hero && (
           <div className="mt-12 grid gap-5 lg:grid-cols-3">
@@ -176,10 +173,10 @@ export default function Landing() {
               <ol className="space-y-1.5">
                 {boi.opportunities.map((o) => (
                   <li key={o.dest} className="flex items-center gap-3 rounded-lg bg-white/[0.03] px-2.5 py-2">
-                    <span className="w-3 text-[11px] text-[#5e6b88]">{o.rank}</span>
+                    <span className="w-3 text-[11px] text-[#71717a]">{o.rank}</span>
                     <CodeTiles code={o.dest} size="sm" tone={o.rank === 1 ? "route" : "text"} />
-                    <span className="flex-1 text-[12.5px] text-[#94a2bd]">{o.dest_city.split(",")[0]}</span>
-                    <span className="font-mono text-[12px] text-[#f5b544]">{o.launch_score.toFixed(1)}</span>
+                    <span className="flex-1 text-[12.5px] text-[#a1a1aa]">{o.dest_city.split(",")[0]}</span>
+                    <span className="font-mono text-[12px] text-[#ffc53d]">{o.launch_score.toFixed(1)}</span>
                   </li>
                 ))}
               </ol>
@@ -198,13 +195,13 @@ export default function Landing() {
             <Screen title="The airline, and the pitch" note="One click writes the case an airport sends to an airline planner.">
               <div className="space-y-2">
                 {hero.airlines.slice(0, 2).map((a, i) => (
-                  <div key={a.carrier} className={`rounded-lg border px-3 py-2 ${i === 0 ? "border-[#f5b544]/40 bg-[#f5b544]/[0.06]" : "border-white/10"}`}>
-                    <div className="flex justify-between text-[13px] font-semibold text-[#e9eef7]"><span>{a.name}</span><span className="font-mono text-[#f5b544]">{Math.round(a.probability * 100)}%</span></div>
-                    <p className="mt-0.5 text-[11px] text-[#94a2bd]">{a.why[0]}</p>
+                  <div key={a.carrier} className={`rounded-lg border px-3 py-2 ${i === 0 ? "border-[#ffc53d]/40 bg-[#ffc53d]/[0.06]" : "border-white/10"}`}>
+                    <div className="flex justify-between text-[13px] font-semibold text-[#f4f4f5]"><span>{a.name}</span><span className="font-mono text-[#ffc53d]">{Math.round(a.probability * 100)}%</span></div>
+                    <p className="mt-0.5 text-[11px] text-[#a1a1aa]">{a.why[0]}</p>
                   </div>
                 ))}
-                <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] p-3 font-mono text-[10.5px] leading-[1.6] text-[#94a2bd]">
-                  <span className="text-[#3dd6f5]">## The ask</span><br />
+                <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] p-3 font-mono text-[10.5px] leading-[1.6] text-[#a1a1aa]">
+                  <span className="text-[#45d9ff]">## The ask</span><br />
                   Boise requests evaluation of a new nonstop BOI–{hero.dest}, the #1 route in its list of missing markets…
                 </div>
               </div>
@@ -214,24 +211,24 @@ export default function Landing() {
       </section>
 
       {/* ------------------------------------------------------------ PROOF */}
-      <section id="proof" className="bg-[var(--ink)] text-[#e9eef7]">
+      <section id="proof" className="border-y border-[var(--rule)] bg-[#070708] text-[#f4f4f5]">
         <div className="mx-auto max-w-[1240px] px-5 sm:px-8 py-24 grid gap-12 lg:grid-cols-[1fr_1.1fr] items-center">
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#3dd6f5]">Proof, not promises</p>
-            <h2 className="font-display mt-3 text-[34px] sm:text-[46px] font-[620] leading-[1.02] tracking-[-0.045em]">
+            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#45d9ff]">Proof, not promises</p>
+            <h2 className="font-display mt-3 text-[34px] sm:text-[46px] font-[540] leading-[1.02] tracking-[-0.035em]">
               We let it call 2025 before 2025 happened.
             </h2>
-            <p className="mt-5 max-w-[480px] text-[16px] leading-[1.6] text-[#94a2bd]">
+            <p className="mt-5 max-w-[480px] text-[16px] leading-[1.6] text-[#a1a1aa]">
               The model learned only from 2024 launches and saw nothing after December 2024. Then we checked its picks against
               every new leisure route that really opened in 2025, and against 2026 routes as they appear.
             </p>
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3">
-              <Link href="/replay" className="rounded-full bg-[#f5b544] px-5 py-2.5 text-[14px] font-semibold text-[#0b1626]">Play the time machine</Link>
-              <Link href="/proof" className="text-[14px] font-semibold text-[#e9eef7] hover:text-[#f5b544]">Read the full backtest →</Link>
+              <Link href="/replay" className="rounded-lg bg-[#ffc53d] px-5 py-2.5 text-[14px] font-semibold text-black">Play the time machine</Link>
+              <Link href="/proof" className="text-[14px] font-semibold text-[#f4f4f5] hover:text-[#ffc53d]">Read the full backtest →</Link>
             </div>
           </div>
           {bt && (
-            <div className="grid gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-2">
+            <div className="grid gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10 sm:grid-cols-2">
               <DarkNumber n={`${bt.replay.in_top10}/${bt.replay.launches}`} l="new 2025 leisure routes were already in their airport's top 10 in January" />
               <DarkNumber n={`${bt.forward.in_top10}/${bt.forward.launches_seen}`} l={`2026 launches through ${MONTHS[bt.forward.through_month]} were called before they opened`} />
               <DarkNumber n={`${auc("logistic | baseline + Qloo")?.toFixed(3)}`} l={`accuracy (AUC) on routes it never saw, up from ${auc("logistic | baseline")?.toFixed(3)} without Qloo`} cyan />
@@ -244,7 +241,7 @@ export default function Landing() {
       {/* ------------------------------------------------------------ WHO IT'S FOR */}
       <section id="who" className="mx-auto max-w-[1240px] px-5 sm:px-8 py-24">
         <Eyebrow>Who it&apos;s for</Eyebrow>
-        <h2 className="font-display mt-3 max-w-[760px] text-[34px] sm:text-[46px] font-[620] leading-[1.02] tracking-[-0.045em]">
+        <h2 className="font-display mt-3 max-w-[760px] text-[34px] sm:text-[46px] font-[540] leading-[1.02] tracking-[-0.035em]">
           For the people whose job is getting the next flight.
         </h2>
         <div className="mt-12 grid gap-5 md:grid-cols-3">
@@ -253,9 +250,9 @@ export default function Landing() {
             ["Communities applying for grants", "Federal air-service grants ask for evidence of demand. Nonstop gives a ranked, sourced case for the route you're asking to fund."],
             ["Tourism boards", "See which towns already love your destination and have no nonstop to it yet, and where a co-funded route would land best."],
           ].map(([t, b], i) => (
-            <div key={t} className="rounded-2xl border border-[var(--rule)] bg-white p-6 shadow-[0_18px_40px_-28px_rgba(11,22,38,0.4)]">
+            <div key={t} className="rounded-xl border border-[var(--rule)] bg-[#0b0b0c] p-6">
               <span className="font-mono text-[12px] text-[var(--amber)]">0{i + 1}</span>
-              <h3 className="font-display mt-3 text-[21px] font-[620] tracking-[-0.025em]">{t}</h3>
+              <h3 className="font-display mt-3 text-[21px] font-[540] tracking-[-0.025em]">{t}</h3>
               <p className="mt-2 text-[14.5px] leading-[1.6] text-[var(--ink-2)]">{b}</p>
             </div>
           ))}
@@ -267,7 +264,7 @@ export default function Landing() {
         <div className="mx-auto max-w-[1240px] px-5 sm:px-8 py-20 grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <Eyebrow>Limits, stated plainly</Eyebrow>
-            <h2 className="font-display mt-3 text-[30px] sm:text-[38px] font-[620] leading-[1.04] tracking-[-0.045em]">What Nonstop doesn&apos;t claim.</h2>
+            <h2 className="font-display mt-3 text-[30px] sm:text-[38px] font-[540] leading-[1.04] tracking-[-0.035em]">What Nonstop doesn&apos;t claim.</h2>
             <Link href="/proof" className="mt-5 inline-block text-[14px] font-semibold hover:text-[var(--amber)]">The full method and results →</Link>
           </div>
           <ul className="grid gap-4 sm:grid-cols-2">
@@ -278,7 +275,7 @@ export default function Landing() {
               ["Groups, never people", "Qloo describes group tastes. No personal data is sent to it."],
             ].map(([t, b]) => (
               <li key={t} className="rounded-xl border border-[var(--rule)] p-5">
-                <p className="font-display text-[17px] font-[620] tracking-[-0.02em]">{t}</p>
+                <p className="font-display text-[17px] font-[540] tracking-[-0.02em]">{t}</p>
                 <p className="mt-1.5 text-[13.5px] leading-[1.55] text-[var(--ink-2)]">{b}</p>
               </li>
             ))}
@@ -289,7 +286,7 @@ export default function Landing() {
       {/* ------------------------------------------------------------ FINAL CTA */}
       <section className="relative graticule border-t border-[var(--rule)] overflow-hidden">
         <div className="mx-auto max-w-[860px] px-5 sm:px-8 py-28 text-center">
-          <h2 className="font-display text-[42px] sm:text-[60px] font-[640] leading-[0.98] tracking-[-0.05em]">
+          <h2 className="font-display text-[42px] sm:text-[60px] font-[560] leading-[0.98] tracking-[-0.04em]">
             Find the flight your town is <span className="text-[var(--amber)]">missing.</span>
           </h2>
           <p className="mx-auto mt-5 max-w-[520px] text-[16px] leading-[1.6] text-[var(--ink-2)]">Type your airport. You&apos;ll see its missing leisure routes, why they rank, and who would fly them.</p>
@@ -297,27 +294,27 @@ export default function Landing() {
         </div>
       </section>
 
-      <footer className="bg-[var(--ink)] text-[#94a2bd]">
+      <footer className="border-t border-[var(--rule)] bg-black text-[#a1a1aa]">
         <div className="mx-auto max-w-[1240px] px-5 sm:px-8 py-12 grid gap-8 md:grid-cols-[1.2fr_1fr_1fr]">
           <div>
             <Wordmark light />
             <p className="mt-3 max-w-[340px] text-[13.5px] leading-[1.6]">Route intelligence for airports: the leisure flights a town is missing, and the airline most likely to fly them.</p>
           </div>
           <div className="text-[13px] leading-[1.9]">
-            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#5e6b88]">Product</p>
+            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#71717a]">Product</p>
             <Link href="/explore" className="block hover:text-white">Live map</Link>
             <Link href="/replay" className="block hover:text-white">Time machine</Link>
             <Link href="/proof" className="block hover:text-white">Proof and method</Link>
           </div>
           <div className="text-[13px] leading-[1.9]">
-            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#5e6b88]">Data</p>
+            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#71717a]">Data</p>
             <p>US DOT BTS T-100 and DB1B · OurAirports</p>
-            <p>Taste data from the <span className="text-[#3dd6f5]">Qloo Insights API</span></p>
+            <p>Taste data from the <span className="text-[#45d9ff]">Qloo Insights API</span></p>
             <p>Map tiles © CARTO, © OpenStreetMap contributors</p>
             <a href="https://github.com/tomcode1000/nonstop" className="block hover:text-white">Source on GitHub (MIT) ↗</a>
           </div>
         </div>
-        <p className="border-t border-white/10 px-5 py-4 text-center text-[11.5px] text-[#5e6b88]">Built for the Qloo Agentic Hackathon, 2026. Forecasts, not guarantees.</p>
+        <p className="border-t border-white/10 px-5 py-4 text-center text-[11.5px] text-[#71717a]">Built for the Qloo Agentic Hackathon, 2026. Forecasts, not guarantees.</p>
       </footer>
     </div>
   );
@@ -329,18 +326,18 @@ function Wordmark({ light = false }: { light?: boolean }) {
   return (
     <span className="flex items-center gap-2.5">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
-        <path d="M3 17 C 7 5, 17 5, 21 17" stroke="#e08a0b" strokeWidth="2.4" strokeLinecap="round" />
-        <circle cx="3" cy="17" r="2.4" fill={light ? "#e9eef7" : "#0b1626"} />
-        <circle cx="21" cy="17" r="2.4" fill="#e08a0b" />
+        <path d="M3 17 C 7 5, 17 5, 21 17" stroke="var(--amber)" strokeWidth="2.4" strokeLinecap="round" />
+        <circle cx="3" cy="17" r="2.4" fill="#f4f4f5" />
+        <circle cx="21" cy="17" r="2.4" fill="var(--amber)" />
       </svg>
-      <span className={`font-display text-[20px] font-[650] tracking-[-0.035em] ${light ? "text-white" : ""}`}>Nonstop</span>
+      <span className={`font-display text-[20px] font-[580] tracking-[-0.035em] ${light ? "text-white" : ""}`}>Nonstop</span>
     </span>
   );
 }
 
 function LandingHeader() {
   return (
-    <header className="fixed top-0 inset-x-0 z-30 border-b border-[var(--rule)] bg-[rgba(244,241,232,0.85)] backdrop-blur-xl">
+    <header className="fixed top-0 inset-x-0 z-30 border-b border-[var(--rule)] bg-[rgba(0,0,0,0.82)] backdrop-blur-xl">
       <div className="mx-auto max-w-[1240px] h-16 px-5 sm:px-8 flex items-center justify-between">
         <Link href="/"><Wordmark /></Link>
         <nav className="hidden md:flex items-center gap-7 text-[14px] text-[var(--ink-2)]">
@@ -351,7 +348,7 @@ function LandingHeader() {
         </nav>
         <div className="flex items-center gap-2">
           <AskNonstop />
-          <Link href="/explore" className="rounded-full bg-[var(--ink)] px-4 py-2 text-[13px] font-semibold text-[var(--paper)] hover:bg-black">Open the map</Link>
+          <Link href="/explore" className="rounded-lg bg-[var(--ink)] px-4 py-2 text-[13px] font-semibold text-[var(--paper)] hover:bg-white/85">Open the map</Link>
         </div>
       </div>
     </header>
@@ -365,18 +362,18 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 function BoardingPass({ origin, originCity, opp }: { origin: string; originCity: string; opp: Opportunity }) {
   const airline = opp.airlines[0];
   return (
-    <div className="ticket rounded-2xl bg-white text-[var(--ink)] shadow-[0_28px_60px_-24px_rgba(11,22,38,0.55)]" style={{ "--tear": "70%" } as React.CSSProperties}>
+    <div className="ticket rounded-xl bg-[#0b0b0c] text-[var(--ink)]" style={{ "--tear": "70%" } as React.CSSProperties}>
       <div className="px-5 pt-4 pb-4">
         <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--ink-3)]">
           <span>Missing route · #1</span><span className="text-[var(--amber)]">Score {opp.launch_score.toFixed(1)}</span>
         </div>
         <div className="mt-3 flex items-end justify-between">
-          <div><div className="font-display text-[36px] font-[680] leading-none tracking-[-0.04em]">{origin}</div><div className="text-[11.5px] text-[var(--ink-3)]">{originCity}</div></div>
+          <div><div className="font-display text-[36px] font-[600] leading-none tracking-[-0.04em]">{origin}</div><div className="text-[11.5px] text-[var(--ink-3)]">{originCity}</div></div>
           <svg width="82" height="26" viewBox="0 0 82 26" aria-hidden className="mb-3">
             <path d="M2 22 C 22 0, 60 0, 80 22" fill="none" stroke="var(--amber)" strokeWidth="2" strokeDasharray="4 4" />
             <circle cx="2" cy="22" r="3" fill="var(--ink)" /><circle cx="80" cy="22" r="3" fill="var(--amber)" />
           </svg>
-          <div className="text-right"><div className="font-display text-[36px] font-[680] leading-none tracking-[-0.04em] text-[var(--amber)]">{opp.dest}</div><div className="text-[11.5px] text-[var(--ink-3)]">{opp.dest_city.split(",")[0]}</div></div>
+          <div className="text-right"><div className="font-display text-[36px] font-[600] leading-none tracking-[-0.04em] text-[var(--amber)]">{opp.dest}</div><div className="text-[11.5px] text-[var(--ink-3)]">{opp.dest_city.split(",")[0]}</div></div>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-3 text-[11px]">
           <div><div className="font-mono uppercase tracking-[0.12em] text-[var(--ink-3)]">Qloo taste</div><div className="mt-0.5 font-semibold text-[var(--cyan)]">Ahead of {Math.round(opp.qloo.rank_among_towns * 100)}% of US towns</div></div>
@@ -395,7 +392,7 @@ function BoardingPass({ origin, originCity, opp }: { origin: string; originCity:
 function BigNumber({ n, label, source, tone }: { n: string; label: string; source: string; tone?: "red" }) {
   return (
     <div className="bg-[var(--paper)] p-7">
-      <div className={`font-display text-[50px] font-[620] leading-none tracking-[-0.05em] ${tone === "red" ? "text-[#c2410c]" : ""}`}>{n}</div>
+      <div className={`font-display text-[50px] font-[540] leading-none tracking-[-0.04em] ${tone === "red" ? "text-[var(--miss)]" : ""}`}>{n}</div>
       <p className="mt-3 text-[15px] leading-[1.5] text-[var(--ink-2)]">{label}</p>
       <p className="mt-3 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--ink-3)]">{source}</p>
     </div>
@@ -405,7 +402,7 @@ function BigNumber({ n, label, source, tone }: { n: string; label: string; sourc
 function Compare({ title, rows, tone }: { title: string; rows: [string, string][]; tone: "muted" | "amber" }) {
   const hi = tone === "amber";
   return (
-    <div className={`rounded-2xl border p-6 ${hi ? "border-[var(--amber)] bg-white shadow-[0_24px_50px_-30px_rgba(224,138,11,0.6)]" : "border-[var(--rule)] bg-transparent"}`}>
+    <div className={`rounded-xl border p-6 ${hi ? "border-[var(--amber)] bg-[#0b0b0c]" : "border-[var(--rule)] bg-transparent"}`}>
       <p className={`font-mono text-[11px] uppercase tracking-[0.16em] ${hi ? "text-[var(--amber)]" : "text-[var(--ink-3)]"}`}>{title}</p>
       <dl className="mt-4 divide-y divide-[var(--rule)]">
         {rows.map(([k, v]) => (
@@ -422,8 +419,8 @@ function Compare({ title, rows, tone }: { title: string; rows: [string, string][
 function Screen({ title, note, children, accent }: { title: string; note: string; children: React.ReactNode; accent?: "cyan" }) {
   return (
     <div>
-      <div className="rounded-2xl bg-[#0a1120] p-4 shadow-[0_30px_60px_-30px_rgba(11,22,38,0.6)] ring-1 ring-black/5 min-h-[300px]">
-        <p className={`mb-3 font-mono text-[10px] uppercase tracking-[0.16em] ${accent === "cyan" ? "text-[#3dd6f5]" : "text-[#5e6b88]"}`}>{title}</p>
+      <div className="rounded-xl bg-[#0b0b0c] p-4 border border-[var(--rule)] min-h-[300px]">
+        <p className={`mb-3 font-mono text-[10px] uppercase tracking-[0.16em] ${accent === "cyan" ? "text-[#45d9ff]" : "text-[#71717a]"}`}>{title}</p>
         {children}
       </div>
       <p className="mt-3 px-1 text-[13.5px] leading-[1.5] text-[var(--ink-2)]">{note}</p>
@@ -434,8 +431,8 @@ function Screen({ title, note, children, accent }: { title: string; note: string
 function TasteBar({ label, v }: { label: string; v: number }) {
   return (
     <div>
-      <div className="flex justify-between text-[11.5px]"><span className="text-[#94a2bd]">{label}</span><span className="font-mono text-[#3dd6f5]">{Math.round(v * 100)}</span></div>
-      <div className="mt-1 h-[5px] rounded-full bg-white/[0.06] overflow-hidden"><div className="h-full rounded-full bg-gradient-to-r from-[#1a7fa3] to-[#3dd6f5]" style={{ width: `${v * 100}%` }} /></div>
+      <div className="flex justify-between text-[11.5px]"><span className="text-[#a1a1aa]">{label}</span><span className="font-mono text-[#45d9ff]">{Math.round(v * 100)}</span></div>
+      <div className="mt-1 h-[5px] rounded-full bg-white/[0.06] overflow-hidden"><div className="h-full rounded-full bg-gradient-to-r from-[#1f6f8a] to-[#45d9ff]" style={{ width: `${v * 100}%` }} /></div>
     </div>
   );
 }
@@ -443,17 +440,17 @@ function TasteBar({ label, v }: { label: string; v: number }) {
 function MiniStat({ v, l, amber }: { v: string; l: string; amber?: boolean }) {
   return (
     <div className="rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-2">
-      <div className={`font-display text-[17px] font-bold ${amber ? "text-[#f5b544]" : "text-[#e9eef7]"}`}>{v}</div>
-      <div className="text-[10.5px] leading-tight text-[#94a2bd]">{l}</div>
+      <div className={`font-display text-[17px] font-bold ${amber ? "text-[#ffc53d]" : "text-[#f4f4f5]"}`}>{v}</div>
+      <div className="text-[10.5px] leading-tight text-[#a1a1aa]">{l}</div>
     </div>
   );
 }
 
 function DarkNumber({ n, l, cyan }: { n: string; l: string; cyan?: boolean }) {
   return (
-    <div className="bg-[var(--ink)] p-6">
-      <div className={`font-display text-[44px] font-[600] leading-none tracking-[-0.05em] ${cyan ? "text-[#3dd6f5]" : "text-[#3ee08f]"}`}>{n}</div>
-      <p className="mt-3 text-[13.5px] leading-[1.5] text-[#94a2bd]">{l}</p>
+    <div className="bg-[#070708] p-6">
+      <div className={`font-display text-[44px] font-[540] leading-none tracking-[-0.04em] ${cyan ? "text-[#45d9ff]" : "text-[#3ee08f]"}`}>{n}</div>
+      <p className="mt-3 text-[13.5px] leading-[1.5] text-[#a1a1aa]">{l}</p>
     </div>
   );
 }

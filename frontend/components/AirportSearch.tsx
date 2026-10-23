@@ -26,9 +26,9 @@ export default function AirportSearch({ dark = false, big = false }: { dark?: bo
   }, [query, airports]);
 
   const input = dark
-    ? "bg-[#060b17] border-line text-text placeholder:text-faint focus:border-route/70"
-    : "bg-white border-[var(--rule)] text-[var(--ink)] placeholder:text-[var(--ink-3)] focus:border-[var(--amber)] shadow-[0_1px_0_rgba(11,22,38,0.04),0_12px_32px_-18px_rgba(11,22,38,0.35)]";
-  const list = dark ? "glass" : "bg-white border border-[var(--rule)] shadow-xl";
+    ? "bg-[#0b0b0c] border-line text-text placeholder:text-faint focus:border-route/70"
+    : "bg-[#0b0b0c] border-[var(--rule)] text-[var(--ink)] placeholder:text-[var(--ink-3)] focus:border-[var(--amber)]";
+  const list = "glass";
 
   return (
     <div className="relative">
@@ -47,7 +47,7 @@ export default function AirportSearch({ dark = false, big = false }: { dark?: bo
         <ul className={`absolute z-20 mt-1.5 w-full rounded-xl overflow-hidden ${list}`}>
           {matches.map((a) => (
             <li key={a.code}>
-              <Link href={`/airport/${a.code}`} className={`flex items-center justify-between gap-3 px-4 py-2.5 ${dark ? "hover:bg-black/[0.04]" : "hover:bg-[var(--paper)]"}`}>
+              <Link href={`/airport/${a.code}`} className={`flex items-center justify-between gap-3 px-4 py-2.5 ${dark ? "hover:bg-white/[0.04]" : "hover:bg-white/[0.04]"}`}>
                 <span className="flex items-center gap-3">
                   <CodeTiles code={a.code} size="sm" />
                   <span className={`text-sm ${dark ? "text-muted" : "text-[var(--ink-2)]"}`}>{a.city}</span>

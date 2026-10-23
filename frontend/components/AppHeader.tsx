@@ -11,7 +11,7 @@ export default function AppHeader() {
   const path = usePathname();
   if (path === "/") return null;
   return (
-    <header className="fixed top-0 inset-x-0 z-30 h-14 flex items-center justify-between px-3 sm:px-5 bg-[rgba(244,241,232,0.88)] backdrop-blur-xl border-b border-line">
+    <header className="fixed top-0 inset-x-0 z-30 h-14 flex items-center justify-between px-3 sm:px-5 bg-[rgba(0,0,0,0.82)] backdrop-blur-xl border-b border-line">
       <Link href="/" className="flex items-center gap-2.5">
         <Logo />
         <span className="font-display text-[18px] font-[650] tracking-[-0.035em]">Nonstop</span>

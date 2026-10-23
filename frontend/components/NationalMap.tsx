@@ -13,20 +13,15 @@ const MapCanvas = dynamic(() => import("@/components/MapCanvas"), { ssr: false }
 export type TopRoute = { origin: string; dest: string; dest_city: string; score: number; from: [number, number]; to: [number, number]; launched: boolean };
 type Flight = TopRoute & { path: [number, number, number][]; times: number[] };
 const LOOP = 120;
+const AMBER: [number, number, number] = [255, 197, 61];
+const GREEN: [number, number, number] = [75, 227, 143];
 
-/** The live national map: every airport, and each airport's #1 missing leisure route as an animated flight. */
-export default function NationalMap({ interactive = true, view, onAirport, vignette = true, theme = "chart" }: {
+/** The live national map: each airport's #1 missing leisure route as an animated flight. */
+export default function NationalMap({ interactive = true, view, onAirport }: {
   interactive?: boolean;
   view?: MapViewState;
   onAirport?: (code: string) => void;
-  vignette?: boolean;
-  theme?: "night" | "chart";
 }) {
-  // On the light chart map, glows become ink and deeper amber so they read on paper.
-  const light = theme === "chart";
-  const ROUTE: [number, number, number] = light ? [214, 128, 8] : [245, 181, 68];
-  const COMET: [number, number, number] = light ? [196, 104, 0] : [255, 196, 92];
-  const CALLED: [number, number, number] = light ? [17, 134, 90] : [62, 224, 143];
   const [airports, setAirports] = useState<Airport[]>([]);
   const [routes, setRoutes] = useState<TopRoute[]>([]);
   const t = useLoopClock(LOOP, 14);
@@ -47,7 +42,7 @@ export default function NationalMap({ interactive = true, view, onAirport, vigne
       id: "route-lines",
       data: flights,
       getPath: (f) => f.path,
-      getColor: (f) => (f.launched ? [...CALLED, light ? 110 : 70] : [...ROUTE, light ? 70 : 38]),
+      getColor: (f) => (f.launched ? [...GREEN, 80] : [...AMBER, 46]),
       widthMinPixels: 1,
       billboard: true,
     }),
@@ -56,7 +51,7 @@ export default function NationalMap({ interactive = true, view, onAirport, vigne
       data: flights,
       getPath: (f) => f.path,
       getTimestamps: (f) => f.times,
-      getColor: (f) => (f.launched ? CALLED : COMET),
+      getColor: (f) => (f.launched ? GREEN : AMBER),
       widthMinPixels: 2.5,
       trailLength: 9,
       fadeTrail: true,
@@ -68,16 +63,16 @@ export default function NationalMap({ interactive = true, view, onAirport, vigne
       id: "airport-halo",
       data: airports,
       getPosition: (a) => [a.lon, a.lat],
-      getRadius: (a) => 22000 + 90000 * Math.sqrt(a.seats / maxSeats),
-      getFillColor: light ? [214, 128, 8, 30] : [245, 181, 68, 26],
-      radiusMinPixels: 5,
+      getRadius: (a) => 20000 + 80000 * Math.sqrt(a.seats / maxSeats),
+      getFillColor: [...AMBER, 28],
+      radiusMinPixels: 4,
     }),
     new ScatterplotLayer<Airport>({
       id: "airports",
       data: airports,
       getPosition: (a) => [a.lon, a.lat],
-      getRadius: (a) => 7000 + 26000 * Math.sqrt(a.seats / maxSeats),
-      getFillColor: (a) => (a.called_2026 > 0 ? [...CALLED, 255] : light ? [11, 22, 38, 220] : [255, 214, 140, 235]),
+      getRadius: (a) => 6000 + 24000 * Math.sqrt(a.seats / maxSeats),
+      getFillColor: (a) => (a.called_2026 > 0 ? [...GREEN, 255] : [255, 236, 190, 240]),
       radiusMinPixels: 2,
       pickable: interactive,
       onClick: ({ object }) => object && onAirport?.(object.code),
@@ -89,8 +84,6 @@ export default function NationalMap({ interactive = true, view, onAirport, vigne
       layers={layers}
       initialView={view}
       interactive={interactive}
-      vignette={vignette}
-      theme={theme}
       tooltip={({ object, layer }) => {
         if (!interactive || layer?.id !== "airports") return null;
         const a = object as Airport | undefined;

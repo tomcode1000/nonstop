@@ -2,6 +2,8 @@
 
 Run: uvicorn nonstop.api:app --reload   (from backend/)
 """
+from functools import lru_cache
+
 import numpy as np
 from fastapi import FastAPI, HTTPException
 from fastapi.concurrency import run_in_threadpool
@@ -32,6 +34,27 @@ def airports():
                     "seats": int(seats.get(code, 0)), "top_opportunity": top.dest, "top_score": float(top.launch_score),
                     "called_2026": int(g[g.rank_at_origin <= 10].already_launched.sum())})
     return sorted(out, key=lambda a: -a["seats"])
+
+
+@lru_cache
+def _dots(step: float):
+    """Positions of every cached Qloo heatmap cell, snapped to a grid and de-duplicated: the US drawn
+    as particles. Positions only; no taste values are exposed here."""
+    import pickle
+    path = features.FEATURE_CACHE / "dest_heatmaps.pkl"
+    store = pickle.loads(path.read_bytes()) if path.exists() else {}
+    seen = set()
+    for _, cells in store.values():
+        if len(cells):
+            for lat, lon in np.round(cells[:, :2] / step).astype(int).tolist():
+                seen.add((lat, lon))
+    return [[round(lon * step, 3), round(lat * step, 3)] for lat, lon in sorted(seen)]
+
+
+@app.get("/api/dots")
+def dots(step: float = 0.3):
+    """The US as a dot matrix (lon, lat), for the particle maps."""
+    return _dots(max(0.1, min(step, 1.0)))
 
 
 @app.get("/api/top-routes")
