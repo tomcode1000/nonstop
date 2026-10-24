@@ -10,7 +10,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from . import agent, data, features, predict, service
+from . import agent, data, features, live, predict, service
 from .service import YEAR, city
 
 app = FastAPI(title="Nonstop", description="Finds the leisure flights a town is missing, using Qloo's taste graph.")
@@ -98,6 +98,28 @@ def heatmap(dest: str, max_points: int = 6000):
         cells = cells[np.random.default_rng(7).choice(len(cells), max_points, replace=False)]
     return {"dest": dest.upper(), "qloo_destination": qdest["name"],
             "cells": [[round(a, 4), round(b, 4), round(c, 3)] for a, b, c, _ in cells.tolist()]}
+
+
+@app.get("/api/live/taste/{origin}")
+async def live_taste(origin: str, place: str):
+    """Qloo, called now: how strongly the area around `origin` leans toward any place (name or IATA code)."""
+    try:
+        return await run_in_threadpool(live.taste, origin, place)
+    except LookupError as err:
+        raise HTTPException(404, str(err)) from None
+    except RuntimeError as err:
+        raise HTTPException(502, str(err)) from None
+
+
+@app.get("/api/live/wanted/{origin}")
+async def live_wanted(origin: str, take: int = 12):
+    """Qloo, called now: the places the area around `origin` loves most, matched to airports and Nonstop's scores."""
+    try:
+        return await run_in_threadpool(live.wanted, origin, take)
+    except LookupError as err:
+        raise HTTPException(404, str(err)) from None
+    except RuntimeError as err:
+        raise HTTPException(502, str(err)) from None
 
 
 @app.get("/api/backtest")

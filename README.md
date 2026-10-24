@@ -47,6 +47,18 @@ new route survives; a second Qloo signal, each town's own top-50 destinations, a
 | `/v2/insights` `filter.type=urn:entity:destination` + `signal.location` | Each town's own favourite destinations (shown as an explanation) |
 | `/search` | Destination lookups with a coordinate check |
 
+**Saved and live.** The model and its backtest need a fixed snapshot, so the ranked lists use Qloo responses
+saved when the features were built. The app also calls Qloo live, at request time:
+
+| Where | Live call | What it answers |
+|---|---|---|
+| Airport page, "Re-check this live on Qloo" | `/v2/insights` (place near the airport) + `urn:heatmap` | The route's taste figures, measured again now, against all 279 towns |
+| Ask Nonstop, `qloo_live_taste` | `/search` or a place lookup + `urn:heatmap` | How any town feels about any place, including places Nonstop doesn't rank |
+| Ask Nonstop, `qloo_live_wanted` | `/v2/insights` + `signal.location` | What an area loves right now, matched to airports, existing nonstops and Nonstop's scores |
+
+Each live answer shows how many Qloo calls it made and how long they took. Repeat questions within an hour are
+answered from memory to protect the monthly quota (`backend/nonstop/live.py`).
+
 About 800 Qloo calls build the full feature set; responses are cached server-side and **never committed**
 (the hackathon rules forbid publishing Qloo data). No personal data is sent to Qloo, and results describe
 group tastes, never individuals.

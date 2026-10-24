@@ -61,6 +61,46 @@ def get(path, params, retries=4):
     return 0, "unreachable"
 
 
+LIVE_TTL = 3600
+_live_memo = {}
+
+
+def live(path, params):
+    """GET Qloo now, bypassing the disk cache. Returns (status, body, ms, fresh).
+
+    Used by the app at request time. A one-hour in-memory memo stops repeat questions from spending
+    the 10k-a-month hackathon quota; nothing is written to disk. `fresh` is False when the memo
+    answered, and `ms` is then the original call's time.
+    """
+    global calls
+    url = BASE + path + "?" + urllib.parse.urlencode(params, doseq=True)
+    hit = _live_memo.get(url)
+    if hit and time.time() - hit[0] < LIVE_TTL:
+        return 200, hit[1], hit[2], False
+    start = time.time()
+    for attempt in range(3):
+        if time.time() - start > 50:
+            break
+        calls += 1
+        req = urllib.request.Request(url, headers={"X-Api-Key": _key(), "accept": "application/json"})
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                body = json.load(r)
+            ms = round((time.time() - start) * 1000)
+            _live_memo[url] = (time.time(), body, ms)
+            return 200, body, ms, True
+        except urllib.error.HTTPError as err:
+            if err.code in (429, 500, 502, 503, 504) and attempt < 2:
+                time.sleep(2 ** attempt)
+                continue
+            return err.code, err.read().decode("utf8", "ignore")[:300], round((time.time() - start) * 1000), True
+        except OSError as err:
+            if attempt == 2:
+                return 0, str(err), round((time.time() - start) * 1000), True
+            time.sleep(2 ** attempt)
+    return 0, "timed out", round((time.time() - start) * 1000), True
+
+
 def entities(body):
     if not isinstance(body, dict):
         return []

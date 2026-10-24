@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 import Markdown from "@/components/Markdown";
 import { API } from "@/lib/api";
 
-type Step = { tool: string; args: Record<string, unknown>; ok: boolean };
+type Step = { tool: string; args: Record<string, unknown>; ok: boolean; live_qloo?: { calls: number; ms: number; fresh: boolean } };
 type Turn = { q: string; answer?: string; trace?: Step[]; error?: string };
 
 const TOOL_LABEL: Record<string, (a: Record<string, unknown>) => string> = {
@@ -16,11 +16,14 @@ const TOOL_LABEL: Record<string, (a: Record<string, unknown>) => string> = {
   search_routes: (a) =>
     `searched routes${a.origin_states ? ` from ${(a.origin_states as string[]).join(", ")}` : ""}${a.dest_states ? ` to ${(a.dest_states as string[]).slice(0, 4).join(", ")}` : ""}`,
   backtest_summary: () => "read the backtest",
+  qloo_live_taste: (a) => `asked Qloo how ${a.origin} feels about ${a.place}`,
+  qloo_live_wanted: (a) => `asked Qloo what ${a.origin}'s area loves`,
 };
 
 const SUGGESTIONS = [
   "Which Texas towns are best placed for a new nonstop to Florida?",
   "What leisure routes is Boise missing, and who would fly them?",
+  "Ask Qloo live: where does Boise's area love that it has no nonstop to?",
   "How accurate is Nonstop, honestly?",
 ];
 
@@ -74,7 +77,7 @@ export default function AskNonstop() {
           <header className="px-4 pt-4 pb-2 border-b border-line">
             <p className="text-sm font-semibold">Ask Nonstop</p>
             <p className="text-xs text-muted">
-              Answers use only Nonstop&apos;s own data and Qloo results; every step is shown.{airport ? ` Looking at ${airport}.` : ""}
+              Answers use only Nonstop&apos;s data and Qloo, some of it called live; every step is shown.{airport ? ` Looking at ${airport}.` : ""}
             </p>
           </header>
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
@@ -94,7 +97,9 @@ export default function AskNonstop() {
                   <div className="flex flex-wrap gap-1">
                     {t.trace.map((s, j) => (
                       <span key={j} className={`text-[10px] rounded-full px-2 py-0.5 border ${s.ok ? "border-taste/40 text-taste" : "border-miss/40 text-miss"}`}>
+                        {s.live_qloo && <b className="font-semibold">⚡ Qloo live · </b>}
                         {(TOOL_LABEL[s.tool] ?? (() => s.tool))(s.args)}
+                        {s.live_qloo && <span className="text-faint"> · {(s.live_qloo.ms / 1000).toFixed(1)}s</span>}
                       </span>
                     ))}
                   </div>
@@ -103,7 +108,7 @@ export default function AskNonstop() {
                 {t.error && <p className="text-xs text-miss">Couldn&apos;t answer: {t.error}</p>}
               </div>
             ))}
-            {busy && <p className="text-xs text-muted animate-pulse">Checking routes, ticket data and Qloo taste…</p>}
+            {busy && <p className="text-xs text-muted animate-pulse">Checking routes, ticket data and Qloo taste (live Qloo calls can take up to a minute)…</p>}
             <div ref={end} />
           </div>
           <form

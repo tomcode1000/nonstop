@@ -6,6 +6,7 @@ import { PathLayer, ScatterplotLayer, TextLayer } from "@deck.gl/layers";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { use, useEffect, useMemo, useState } from "react";
+import LiveQloo from "@/components/LiveQloo";
 import RouteCaseButton from "@/components/RouteCaseButton";
 import { CodeTiles, Eyebrow, Panel, Pill, ScoreRing } from "@/components/ui";
 import { type AirportView, fmtInt, fmtUsd, get, type Heatmap, type Opportunity } from "@/lib/api";
@@ -295,6 +296,7 @@ function RouteCard({ origin, opp, heat, showHeat, setShowHeat }: {
           <input type="checkbox" checked={showHeat} onChange={(e) => setShowHeat(e.target.checked)} className="accent-[var(--taste)]" />
           Show Qloo&apos;s taste map for {anchor}
         </label>
+        <LiveQloo key={`${origin}-${opp.dest}`} origin={origin} dest={opp.dest} />
       </section>
 
       <section className="p-5 border-b border-line">

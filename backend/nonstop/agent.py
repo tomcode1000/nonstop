@@ -4,7 +4,7 @@ with the answer so the UI can show its sources.
 """
 import json
 
-from . import llm, service
+from . import live, llm, service
 
 SYSTEM = """You are Nonstop, an analyst for airport air-service teams. Nonstop predicts which new
 leisure nonstop routes airlines (Allegiant, Breeze, Avelo, Sun Country, Frontier, Spirit) are likely
@@ -20,6 +20,10 @@ Rules:
 - "qloo_destination" is the Qloo place used as the taste anchor for the destination airport (Monterey's
   airport uses Santa Cruz, Destin's uses Destin). Call it the taste anchor; the route is still to the airport.
 - Nonstop does not predict whether routes survive or get cut; never claim it does.
+- Two tools call Qloo live (qloo_live_taste, qloo_live_wanted). Use them when the user asks about a place
+  Nonstop does not rank, asks what an area loves, or asks to check something live. When you use one, say
+  it is a live Qloo check. Live affinity can differ slightly from the saved figures the model was trained
+  on; if both appear, say which is which rather than mixing them.
 - Be concise: a short direct answer first, then up to 5 bullet points. No headings."""
 
 TOOLS = [
@@ -51,6 +55,25 @@ TOOLS = [
         "name": "backtest_summary",
         "description": "How accurate Nonstop has been: temporal backtest, 2025 replay and 2026 forward check.",
         "parameters": {"type": "object", "properties": {}}}},
+    {"type": "function", "function": {
+        "name": "qloo_live_taste",
+        "description": "Calls Qloo live, now: how strongly the area around an origin airport leans toward ANY destination "
+                       "(a place name like 'Asheville' or an IATA code), compared with every other US town Nonstop covers, "
+                       "and the towns that lean toward it most. Works for places Nonstop does not rank. Takes 5-60 seconds.",
+        "parameters": {"type": "object", "properties": {
+            "origin": {"type": "string", "description": "IATA code of the origin airport"},
+            "place": {"type": "string", "description": "Destination name or IATA code"}},
+            "required": ["origin", "place"]}}},
+    {"type": "function", "function": {
+        "name": "qloo_live_wanted",
+        "description": "Calls Qloo live, now: the places the area around an airport loves most beyond driving distance, each "
+                       "with its nearest airport, whether a nonstop already exists, and Nonstop's launch score if ranked. "
+                       "nearest_airport is Nonstop's match (busiest airline airport within 60 km, else nearest within 80 km); "
+                       "null means no airport with airline service is close, not that Qloo lacks data.",
+        "parameters": {"type": "object", "properties": {
+            "origin": {"type": "string", "description": "IATA code of the origin airport"},
+            "take": {"type": "integer", "default": 12}},
+            "required": ["origin"]}}},
 ]
 
 
@@ -73,12 +96,16 @@ def run_tool(name, args):
         if name == "search_routes":
             return service.search_routes(args.get("origin_states"), args.get("dest_states"), args.get("dest_codes"),
                                          limit=int(args.get("limit", 10)))
+        if name == "qloo_live_taste":
+            return live.taste(args["origin"], args["place"])
+        if name == "qloo_live_wanted":
+            return live.wanted(args["origin"], int(args.get("take", 12)))
         if name == "backtest_summary":
             b = service.backtest_summary()
             return {"models": {k: v for k, v in b["models"].items() if "logistic" in k},
                     "test": b["test"], "replay": b["replay"], "forward": b["forward"]}
         return {"error": f"unknown tool {name}"}
-    except (LookupError, KeyError, ValueError) as err:
+    except (LookupError, KeyError, ValueError, RuntimeError) as err:
         return {"error": str(err)}
 
 
@@ -102,7 +129,11 @@ def ask(question, airport=None, max_rounds=6):
             except json.JSONDecodeError:
                 args = {}
             result = run_tool(name, args)
-            trace.append({"tool": name, "args": args, "ok": not (isinstance(result, dict) and "error" in result)})
+            step = {"tool": name, "args": args, "ok": not (isinstance(result, dict) and "error" in result)}
+            if isinstance(result, dict) and "qloo_calls" in result:
+                step["live_qloo"] = {"calls": len(result["qloo_calls"]), "ms": sum(c["ms"] for c in result["qloo_calls"]),
+                                     "fresh": any(c["fresh"] for c in result["qloo_calls"])}
+            trace.append(step)
             messages.append({"role": "tool", "tool_call_id": call["id"], "content": json.dumps(result, default=str)[:12000]})
     final = llm.chat(messages + [{"role": "user", "content": "Answer now from the tool results above."}])
     return {"answer": (final.get("content") or "").strip(), "trace": trace}
