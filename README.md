@@ -5,6 +5,10 @@ Frontier, Spirit) are likely to launch next. It combines every US route and tick
 Department of Transportation with **Qloo's taste graph**: where people's tastes for a destination
 already are, even when no direct flight exists yet.
 
+**Live app: https://nonstopapp.vercel.app** (no login). Try [Boise](https://nonstopapp.vercel.app/airport/BOI),
+press "Re-check this live on Qloo", then ask the agent (top right) or play the [time machine](https://nonstopapp.vercel.app/replay).
+The API runs on Render: https://nonstop-api.onrender.com/api/health
+
 Built for the [Qloo Agentic Hackathon](https://qloo.devpost.com/).
 
 **Who it's for:** airport air-service teams who pitch new routes to airlines, small communities applying
