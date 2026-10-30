@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import AirportSearch from "@/components/AirportSearch";
 import AskNonstop from "@/components/AskNonstop";
 import NationalMap, { type TopRoute } from "@/components/NationalMap";
-import { CodeTiles } from "@/components/ui";
+import { CodeTiles, Logo } from "@/components/ui";
 import { type AirportView, fmtInt, fmtUsd, get, type Opportunity } from "@/lib/api";
 
 type Backtest = {
@@ -325,11 +325,7 @@ export default function Landing() {
 function Wordmark({ light = false }: { light?: boolean }) {
   return (
     <span className="flex items-center gap-2.5">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
-        <path d="M3 17 C 7 5, 17 5, 21 17" stroke="var(--amber)" strokeWidth="2.4" strokeLinecap="round" />
-        <circle cx="3" cy="17" r="2.4" fill="#f4f4f5" />
-        <circle cx="21" cy="17" r="2.4" fill="var(--amber)" />
-      </svg>
+      <Logo size={28} />
       <span className={`font-display text-[20px] font-[580] tracking-[-0.035em] ${light ? "text-white" : ""}`}>Nonstop</span>
     </span>
   );

@@ -64,13 +64,21 @@ export function Pill({ children, tone = "muted" }: { children: ReactNode; tone?:
   return <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10.5px] font-medium ${cls}`}>{children}</span>;
 }
 
-/** Brand mark: a route arc over a dot. */
-export function Logo() {
+/** Brand mark: an N drawn as one unbroken flight path, origin (white) to destination (amber). */
+export function Logo({ size = 24 }: { size?: number }) {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path d="M3 17 C 7 5, 17 5, 21 17" stroke="var(--route)" strokeWidth="2.2" strokeLinecap="round" />
-      <circle cx="3" cy="17" r="2.3" fill="var(--text)" />
-      <circle cx="21" cy="17" r="2.3" fill="var(--route)" />
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden>
+      <defs>
+        <linearGradient id="ns-route" gradientUnits="userSpaceOnUse" x1="9" y1="0" x2="23" y2="0">
+          <stop offset="0" stopColor="#fff3d1" />
+          <stop offset="0.45" stopColor="#ffd36b" />
+          <stop offset="1" stopColor="#ffc53d" />
+        </linearGradient>
+      </defs>
+      <rect x="0.3" y="0.3" width="31.4" height="31.4" rx="7.2" fill="#0b0b0c" stroke="#2a2a2e" strokeWidth="0.6" />
+      <path d="M9.6 22.6 V9.6 C15.2 12.2 19.4 16.4 22.4 22.4 V9.4" stroke="url(#ns-route)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="9.6" cy="22.6" r="2.15" fill="#ffffff" />
+      <circle cx="22.4" cy="9.4" r="2.15" fill="#ffc53d" />
     </svg>
   );
 }

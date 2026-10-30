@@ -13,7 +13,7 @@ export default function AppHeader() {
   return (
     <header className="fixed top-0 inset-x-0 z-30 h-14 flex items-center justify-between px-3 sm:px-5 bg-[rgba(0,0,0,0.82)] backdrop-blur-xl border-b border-line">
       <Link href="/" className="flex items-center gap-2.5">
-        <Logo />
+        <Logo size={26} />
         <span className="font-display text-[18px] font-[650] tracking-[-0.035em]">Nonstop</span>
         <span className="hidden md:inline text-[11px] text-faint border-l border-line pl-2.5 ml-0.5">Route intelligence for airports</span>
       </Link>

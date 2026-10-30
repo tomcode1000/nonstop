@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Nonstop logo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;650&display=swap" rel="stylesheet">
+<style>
+  /* Nonstop mark: an N drawn as one unbroken flight path, origin (white) to destination (amber). */
+  html, body { margin: 0; background: #000; color: #f4f4f5; font-family: "Inter Tight", sans-serif; }
+  .row { display: flex; align-items: center; gap: 40px; padding: 40px; }
+  .lock { display: flex; align-items: center; gap: 14px; font-size: 40px; font-weight: 650; letter-spacing: -0.035em; }
+  .light { background: #f4f4f5; color: #0b0b0c; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="route" gradientUnits="userSpaceOnUse" x1="9" y1="0" x2="23" y2="0">
+      <stop offset="0" stop-color="#fff3d1"/>
+      <stop offset="0.45" stop-color="#ffd36b"/>
+      <stop offset="1" stop-color="#ffc53d"/>
+    </linearGradient>
+    <symbol id="mark" viewBox="0 0 32 32">
+      <rect x="0.3" y="0.3" width="31.4" height="31.4" rx="7.2" fill="#0b0b0c" stroke="#2a2a2e" stroke-width="0.6"/>
+      <path d="M9.6 22.6 V9.6 C15.2 12.2 19.4 16.4 22.4 22.4 V9.4"
+            fill="none" stroke="url(#route)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="9.6" cy="22.6" r="2.15" fill="#ffffff"/>
+      <circle cx="22.4" cy="9.4" r="2.15" fill="#ffc53d"/>
+    </symbol>
+  </defs>
+</svg>
+<div class="row">
+  <svg width="512" height="512"><use href="#mark"/></svg>
+  <div>
+    <svg width="128" height="128"><use href="#mark"/></svg>
+    <svg width="64" height="64"><use href="#mark"/></svg>
+    <svg width="32" height="32"><use href="#mark"/></svg>
+    <svg width="16" height="16"><use href="#mark"/></svg>
+  </div>
+</div>
+<div class="row"><div class="lock"><svg width="44" height="44"><use href="#mark"/></svg>Nonstop</div></div>
+<div class="row light"><div class="lock"><svg width="44" height="44"><use href="#mark"/></svg>Nonstop</div></div>
+</body>
+</html>
